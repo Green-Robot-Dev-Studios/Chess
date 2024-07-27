@@ -12,29 +12,34 @@ enum GameState {
     Check,
     CheckmateWhite,
     CheckmateBlack,
-    Stalemate
+    Stalemate,
+    ResignedWhite,
+    ResignedBlack
 };
 
 class ChessGame {
     Board board;
-    Player whitePlayer;
-    Player blackPlayer;
+    std::shared_ptr<Player> whitePlayer;
+    std::shared_ptr<Player> blackPlayer;
     PieceColor turn;
     std::vector<Move> moveList;
     GameState gameState;
 
 public:
     void startGame();
-    void endGame();
+    /* ****************** */
+    // TODO: why do we need this?
+    // void endGame();
+    /* ****************** */
     void resign();
-    void move(Move);
-    GameState checkState();
-    bool isCheck();
-    bool isWhiteCheckmate();
-    bool isBlackCheckmate();
-    bool isStalemate();
+    bool move(const Move &move);
+    GameState getState();
+    GameState isCheck();
+    GameState isCheckmate();
+    GameState isStalemate();
     PieceColor getTurn();
     void changeTurn();
+    std::vector<Move> generateLegalMoves();
 };
 
 #endif

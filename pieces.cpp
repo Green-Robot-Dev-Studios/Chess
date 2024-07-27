@@ -27,7 +27,7 @@ int Piece::getRow() { return row; }
 
 int Piece::getMoveCount() { return moveCount; }
 
-Piece::Piece(PieceColor c, int r, int col) : color(c), row(r), col(col) {}
+char Piece::getLetter() { return color == White ? letter : ::toupper(letter); }
 
 // Bishop should move same magnitude in both axes
 bool Bishop::isMoveValidInternal(const Move &move) {

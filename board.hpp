@@ -11,8 +11,8 @@ class Board {
     std::vector<std::vector<Square>> board;
 public:
     void resetBoard();
-    void move(Move);
-    Piece getPieceAt(int, int);
+    void move(const Move &move);
+    std::shared_ptr<Piece> getPieceAt(int, int);
     std::vector<std::vector<Square>> getState();
 };
 

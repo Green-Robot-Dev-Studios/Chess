@@ -6,10 +6,16 @@ bool Square::isOccupied() {
     return piece != nullptr;
 }
 
-void Square::setPiece(Piece piece) {
-    this->piece = std::make_shared<Piece>(piece);
+void Square::setPiece(const std::shared_ptr<Piece>& p) {
+    piece = p;
 }
 
 std::shared_ptr<Piece> Square::getPiece() { 
     return piece;
+}
+
+void Square::removePiece() {
+    // TODO: does setting a shared pointer to nullptr work?
+    // piece = nullptr;
+    piece.reset();
 }

@@ -13,7 +13,8 @@ public:
     Square(int r, int c);
     bool isOccupied();
     std::shared_ptr<Piece> getPiece();
-    void setPiece(Piece);
+    void setPiece(const std::shared_ptr<Piece>& p);
+    void removePiece();
 };
 
 #endif

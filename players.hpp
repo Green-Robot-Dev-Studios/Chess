@@ -1,15 +1,13 @@
 #ifndef PLAYERS_H
 #define PLAYERS_H
 
-#include "game.hpp"
 #include "move.hpp"
 
 class Player {
     PieceColor color;
-    ChessGame game;
     int score;
 private:
-    virtual Move getMove();
+    virtual Move getMove() = 0;
 };
 
 class Human : public Player {};
