@@ -1,29 +1,33 @@
 #include "game.hpp"
+#include "text_view.hpp"
 #include <iostream>
+#include <memory>
 #include <vector>
 #include <string>
 
 int main() {
-    ChessGame game{};
+    std::shared_ptr<Board> board = std::make_shared<Board>();
+    std::shared_ptr<Player> playerWhite = std::make_shared<Human>();
+    std::shared_ptr<Player> playerBlack = std::make_shared<Human>();
+
+    ChessGame game{board, playerWhite, playerBlack};
     game.startGame();
 
-    // CHORE: refactor getState calls
+    TextView view = TextView(board);
+    board->notifyObservers();
+
+    // TODO: refactor getState calls
 
     while (game.getState() == Ongoing || game.getState() == Check) {
-        if (game.getState() == Check) 
+        if (game.getState() == Check) {
             std::cout << "Warning, you are in check!";
+        }
 
-        std::string answer;
-        std::cout << "Where would you like to move: ";
-        std::cin >> answer;
-
-        // <oldRow><oldColumn><newRow><newColumn>
-        int oldRow = answer[0] - '0';
-        int oldColumn = answer[1] - '0';
-        int newRow = answer[2] - '0';
-        int newColumn = answer[3] - '0';
-        if (game.move(Move{ oldRow, oldColumn, newRow, newColumn })) {
+        auto &current = game.getTurn() == White ? playerWhite : playerBlack;
+        auto move = current->getMove();
+        if (game.move(move)) {
             std::cout << "Moved!\n";
+            game.changeTurn();
         } else {
             std::cout << "Invalid move!\n";
         }

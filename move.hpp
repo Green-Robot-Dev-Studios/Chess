@@ -2,8 +2,8 @@
 #define MOVE_H
 
 enum PieceColor {
-    Black,
-    White
+    Black = 0,
+    White = 1
 };
 
 struct Move {
@@ -13,7 +13,5 @@ struct Move {
     int newCol;
     PieceColor color;
 };
-
-
 
 #endif

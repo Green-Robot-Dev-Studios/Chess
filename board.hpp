@@ -4,10 +4,11 @@
 #include "pieces.hpp"
 #include "square.hpp"
 #include "move.hpp"
+#include "subject.hpp"
 
 #include <vector>
 
-class Board {
+class Board: public Subject {
     std::vector<std::vector<Square>> board;
 public:
     void resetBoard();

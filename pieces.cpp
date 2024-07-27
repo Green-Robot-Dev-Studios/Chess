@@ -2,6 +2,7 @@
 #include "move.hpp"
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 bool Piece::isMoveValid(const Move &move) {
     if (move.oldCol != col || move.oldRow != row) {
@@ -27,7 +28,7 @@ int Piece::getRow() { return row; }
 
 int Piece::getMoveCount() { return moveCount; }
 
-char Piece::getLetter() { return color == White ? letter : ::toupper(letter); }
+char Piece::getLetter() { return color == Black ? letter : ::toupper(letter); }
 
 // Bishop should move same magnitude in both axes
 bool Bishop::isMoveValidInternal(const Move &move) {
@@ -69,28 +70,30 @@ bool Knight::isMoveValidInternal(const Move &move) {
 */
 bool Pawn::isMoveValidInternal(const Move &move) {
     PieceColor color = getColor();
+    // std::cout << "color: " << color << std::endl;
+    // std::cout << "old row: " << move.oldRow << " old col: " << move.oldCol << " new row: " << move.newRow << " new col: " << move.newCol << std::endl;
 
     int dx = abs(move.newCol - move.oldCol);
     int dy = abs(move.newRow - move.oldRow);
 
     if (color == PieceColor::Black) {
         // check that it has moved forward
-        if(move.newCol <= move.oldCol) {
+        if(move.newRow <= move.oldRow) {
             return false;
         }
 
         // check for two unit advance
-        if(getMoveCount() == 0 && move.newCol == move.oldCol + 2 && move.newRow == move.oldRow) {
+        if(getMoveCount() == 0 && move.newRow == move.oldRow + 2 && move.newCol == move.oldCol) {
             return true;
         }
     } else {
         // check that it has moved forward
-        if(move.newCol >= move.oldCol) {
+        if(move.newRow >= move.oldRow) {
             return false;
         }
 
         // check for two unit advance
-        if(getMoveCount() == 0 && move.newCol == move.oldCol - 2 && move.newRow == move.oldRow) {
+        if(getMoveCount() == 0 && move.newRow == move.oldRow - 2 && move.newCol == move.oldCol) {
             return true;
         }
     }

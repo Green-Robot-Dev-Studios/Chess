@@ -2,18 +2,14 @@
 #define RENDER_VIEW_H
 
 #include "board.hpp"
-class Subject {
+#include "observer.hpp"
+#include <memory>
 
-};
-
-class Observer {
-
-};
-
-class ViewChild {
+class ViewChild : public Observer {
 public:
-    Board *board;
-    virtual void draw();
+    std::shared_ptr<Board> board;
+    ViewChild(std::shared_ptr<Board> board) : board{board} {};
+    virtual void draw() = 0;
 };
 
 #endif

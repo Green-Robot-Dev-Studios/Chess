@@ -7,7 +7,7 @@ void ChessGame::startGame() {
     gameState = Ongoing;
     moveList.clear();
     turn = White;
-    board.resetBoard();
+    board->resetBoard();
 }
 
 void ChessGame::resign() {
@@ -19,29 +19,19 @@ void ChessGame::resign() {
 }
 
 bool ChessGame::move(const Move &move) {
-    std::shared_ptr<Piece> piece = board.getPieceAt(move.oldRow, move.oldCol);
-    if (!piece->isMoveValid(move)) {
+    std::shared_ptr<Piece> piece = board->getPieceAt(move.oldRow, move.oldCol);
+    if (!piece->isMoveValid(move) || piece->getColor() != turn) {
         return false;
     }
 
-    board.move(move);
+    // TODO: check move logic
+    // TODO: set game state
+
+    board->move(move);
     return true;
 }
 
 GameState ChessGame::getState() { return gameState; }
-
-GameState ChessGame::isCheck() {
-    std::pair<int, int> loc = findKing(turn);
-    
-}
-
-GameState ChessGame::isCheckmate() {
-
-}
-
-GameState ChessGame::isStalemate() {
-
-}
 
 PieceColor ChessGame::getTurn() { return turn; }
 
@@ -60,7 +50,7 @@ std::pair<int, int> ChessGame::findKing(PieceColor color) {
     bool found = false;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            std::shared_ptr<Piece> piece = board.getPieceAt(i, j);
+            std::shared_ptr<Piece> piece = board->getPieceAt(i, j);
             if(std::dynamic_pointer_cast<King>(piece) && piece->getColor() == color) {
                 loc = std::make_pair(i, j);
                 found = true;
@@ -76,8 +66,12 @@ std::pair<int, int> ChessGame::findKing(PieceColor color) {
     return loc;
 }
 
-std::vector<Move> ChessGame::generateLegalMovesInternal(PieceColor color) {
+void ChessGame::determineState() {
     
+}
+
+std::vector<Move> ChessGame::generateLegalMovesInternal(PieceColor color) {
+    return {};
 }
 
 std::vector<Move> ChessGame::generateLegalMoves() {

@@ -2,10 +2,15 @@
 #define TEXT_VIEW_H
 
 #include "render_view.hpp"
+#include <memory>
 
 class TextView : public ViewChild {
     void draw() override;
-    void notify();
+    void notify() override;
+public:
+    TextView(std::shared_ptr<Board> board) : ViewChild(board) {
+        board->attach(std::shared_ptr<Observer>(this));
+    };
 };
 
 #endif

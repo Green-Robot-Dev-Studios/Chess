@@ -55,8 +55,13 @@ void Board::move(const Move &move) {
     // Move the piece to the destination square
     board[move.newRow][move.newCol].setPiece(piece);
 
+    // Update piece fields
+    piece->move(move);
+
     // Clear the source square
     board[move.oldRow][move.oldCol].removePiece();
+
+    notifyObservers();
 }
 
 std::shared_ptr<Piece> Board::getPieceAt(int row, int col) {
