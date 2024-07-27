@@ -10,7 +10,7 @@ class Observer {
 
 };
 
-class View {
+class ViewChild {
 public:
     Board *board;
     virtual void draw();

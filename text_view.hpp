@@ -3,8 +3,8 @@
 
 #include "render_view.hpp"
 
-class TextView : public View {
-    void draw();
+class TextView : public ViewChild {
+    void draw() override;
     void notify();
 };
 

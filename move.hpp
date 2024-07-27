@@ -14,4 +14,6 @@ struct Move {
     PieceColor color;
 };
 
+
+
 #endif

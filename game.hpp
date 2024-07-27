@@ -25,6 +25,9 @@ class ChessGame {
     std::vector<Move> moveList;
     GameState gameState;
 
+    std::pair<int, int> findKing(PieceColor color);
+    std::vector<Move> generateLegalMovesInternal(PieceColor color);
+
 public:
     void startGame();
     /* ****************** */
