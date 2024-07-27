@@ -2,26 +2,51 @@
 #define PLAYERS_H
 
 #include "move.hpp"
+#include "game.hpp"
 
 class Player {
+protected:
     PieceColor color;
     int score;
+    ChessGame* game;
 public:
+    Player(PieceColor color, ChessGame* game) : color(color), score(0), game(game) {}
     virtual Move getMove() = 0;
 };
 
 class Human : public Player {
-    Move getMove();
+public:
+    Human(PieceColor color, ChessGame* game) : Player(color, game) {}
+    Move getMove() override;
 };
 
-class Computer : public Player {};
+class Computer : public Player {
+public:
+    Computer(PieceColor color, ChessGame* game) : Player(color, game) {}
+};
 
-class Level1 : public Computer {};
+class Level1 : public Computer {
+public:
+    Level1(PieceColor color, ChessGame* game) : Computer(color, game) {}
+    Move getMove() override;
+};
 
-class Level2 : public Computer {};
+class Level2 : public Computer {
+public:
+    Level2(PieceColor color, ChessGame* game) : Computer(color, game) {}
+    Move getMove() override;
+};
 
-class Level3 : public Computer {};
+class Level3 : public Computer {
+public:
+    Level3(PieceColor color, ChessGame* game) : Computer(color, game) {}
+    Move getMove() override;
+};
 
-class Level4 : public Computer {};
+class Level4 : public Computer {
+public:
+    Level4(PieceColor color, ChessGame* game) : Computer(color, game) {}
+    Move getMove() override;
+};
 
 #endif

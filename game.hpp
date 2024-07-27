@@ -2,10 +2,11 @@
 #define GAME_H
 
 #include "board.hpp"
-#include "players.hpp"
 #include "move.hpp"
 
 #include <vector>
+
+class Player;
 
 enum GameState {
     Ongoing = 0,
@@ -25,12 +26,14 @@ class ChessGame {
     std::vector<Move> moveList;
     GameState gameState;
 
-    void determineState();
+    void calculateState();
     std::pair<int, int> findKing(PieceColor color);
     std::vector<Move> generateLegalMovesInternal(PieceColor color);
 
 public:
+    ChessGame(std::shared_ptr<Board> board): board(board) {};
     ChessGame(std::shared_ptr<Board> board, std::shared_ptr<Player> whitePlayer, std::shared_ptr<Player> blackPlayer) : board(board), whitePlayer(whitePlayer), blackPlayer(blackPlayer) {};
+    void setPlayers(std::shared_ptr<Player> white, std::shared_ptr<Player> black);
     void startGame();
     /* ****************** */
     // TODO: why do we need this?
@@ -42,6 +45,9 @@ public:
     PieceColor getTurn();
     void changeTurn();
     std::vector<Move> generateLegalMoves();
+    bool isCapture(const Move &move);
+    bool isCheck(const Move &move);
+    bool isMoveSafe(const Move &move);
 };
 
 #endif

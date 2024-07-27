@@ -1,5 +1,6 @@
 #include "game.hpp"
 #include "text_view.hpp"
+#include "players.hpp"
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -7,10 +8,16 @@
 
 int main() {
     std::shared_ptr<Board> board = std::make_shared<Board>();
-    std::shared_ptr<Player> playerWhite = std::make_shared<Human>();
-    std::shared_ptr<Player> playerBlack = std::make_shared<Human>();
+    // std::shared_ptr<Player> playerWhite = std::make_shared<Human>();
+    // std::shared_ptr<Player> playerBlack = std::make_shared<Human>();
 
-    ChessGame game{board, playerWhite, playerBlack};
+    // ChessGame game{board, playerWhite, playerBlack};
+    ChessGame game{board}; 
+
+    std::shared_ptr<Player> playerWhite = std::make_shared<Human>(PieceColor::White, &game); 
+    std::shared_ptr<Player> playerBlack = std::make_shared<Human>(PieceColor::Black, &game); 
+    game.setPlayers(playerWhite, playerBlack); 
+
     game.startGame();
 
     TextView view = TextView(board);

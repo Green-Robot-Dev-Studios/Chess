@@ -3,6 +3,11 @@
 #include "pieces.hpp"
 #include <memory>
 
+void ChessGame::setPlayers(std::shared_ptr<Player> white, std::shared_ptr<Player> black) {
+    this->whitePlayer = white;
+    this->blackPlayer = black;
+}
+
 void ChessGame::startGame() {
     gameState = Ongoing;
     moveList.clear();
@@ -66,7 +71,7 @@ std::pair<int, int> ChessGame::findKing(PieceColor color) {
     return loc;
 }
 
-void ChessGame::determineState() {
+void ChessGame::calculateState() {
     
 }
 
@@ -78,3 +83,25 @@ std::vector<Move> ChessGame::generateLegalMoves() {
     return turn == White ? generateLegalMovesInternal(White)
                          : generateLegalMovesInternal(Black);
 }
+
+bool ChessGame::isCapture(const Move &move) {
+    return board->getPieceAt(move.newRow, move.newCol) != nullptr;
+}
+
+bool ChessGame::isCheck(const Move &move) {
+    return false;
+}
+
+// std::pair<int, int> ChessGame::findKing(PieceColor color) {
+//     // Find the position of the king of the specified color
+//     for (int row = 0; row < 8; ++row) {
+//         for (int col = 0; col < 8; ++col) {
+//             auto piece = board->getPieceAt(row, col);
+//             if (piece && piece->letter == "k" && piece->color == color) {
+//                 return {row, col};
+//             }
+//         }
+//     }
+//     // Should never reach here if the king is always present on the board
+//     return {-1, -1};
+// }
