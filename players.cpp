@@ -11,10 +11,10 @@ Move Human::getMove() {
     std::cin >> answer;
 
     // <oldRow><oldcolumn><newRow><newColumn>
-    int oldRow = 8 - (answer[0] - '0');
     int oldColumn = answer[1] - 'a';
-    int newRow = 8 - (answer[2] - '0');
+    int oldRow = 8 - (answer[0] - '0');
     int newColumn = answer[3] - 'a';
+    int newRow = 8 - (answer[2] - '0');
     
     return Move{oldRow, oldColumn, newRow, newColumn};
 }

@@ -8,10 +8,6 @@
 
 int main() {
     std::shared_ptr<Board> board = std::make_shared<Board>();
-    // std::shared_ptr<Player> playerWhite = std::make_shared<Human>();
-    // std::shared_ptr<Player> playerBlack = std::make_shared<Human>();
-
-    // ChessGame game{board, playerWhite, playerBlack};
     ChessGame game{board}; 
 
     std::shared_ptr<Player> playerWhite = std::make_shared<Human>(PieceColor::White, &game); 
@@ -23,10 +19,10 @@ int main() {
     TextView view = TextView(board);
     board->notifyObservers();
 
-    // TODO: refactor getState calls
+    GameState state = game.getState();
 
-    while (game.getState() == Ongoing || game.getState() == Check) {
-        if (game.getState() == Check) {
+    while (state == Ongoing || state == CheckForBlack || state == CheckForWhite) {
+        if (state == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {
             std::cout << "Warning, you are in check!";
         }
 
@@ -44,10 +40,10 @@ int main() {
         }
     }
 
-    if (game.getState() == CheckmateWhite) std::cout << "White checkmate!\n";
-    if (game.getState() == CheckmateBlack) std::cout << "Black checkmate!\n";
-    if (game.getState() == ResignedWhite) std::cout << "White resignation!\n";
-    if (game.getState() == ResignedBlack) std::cout << "Black resignation!\n";
+    if (game.getState() == CheckmateForWhite) std::cout << "Black in checkmate!\n";
+    if (game.getState() == CheckmateForBlack) std::cout << "White in checkmate!\n";
+    if (game.getState() == ResignedWhite) std::cout << "White resigns!\n";
+    if (game.getState() == ResignedBlack) std::cout << "Black resigns!\n";
     if (game.getState() == Stalemate) std::cout << "Stalemate!\n";
 
     return 0;

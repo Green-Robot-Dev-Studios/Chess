@@ -266,8 +266,10 @@ bool ChessGame::isCapture(const Move &move) const {
 }
 
 bool ChessGame::isCheck(const Move &move) const {
-    return isCheckInternal(
-        move, findKing(move.color == White ? Black : White, *board));
+    Board preliminaryBoard = Board(*board);
+    preliminaryBoard.move(move);
+    
+    return isKingInCheck(move.color == White ? Black : White, preliminaryBoard);
 }
 
 int ChessGame::evaluateBoard(PieceColor color) const {

@@ -8,6 +8,7 @@
 
 class Player;
 
+// for <color> means that <color> is in an advantageous position
 enum GameState {
     Ongoing = 0,
     CheckForWhite = 1,
@@ -58,7 +59,6 @@ public:
     bool isCapture(const Move &move) const;
     bool isCheck(const Move &move) const;
     bool isMoveSafe(const Move &move) const;
-    std::pair<int, int> findKing(PieceColor color) const;  
     int evaluateBoard(PieceColor color) const;
 };
 
