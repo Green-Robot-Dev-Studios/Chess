@@ -30,8 +30,12 @@ int main() {
             std::cout << "Warning, you are in check!";
         }
 
-        auto &current = game.getTurn() == White ? playerWhite : playerBlack;
-        auto move = current->getMove();
+        PieceColor currentColor = game.getTurn();
+        std::shared_ptr<Player> &currentPlayer = currentColor == White ? playerWhite : playerBlack;
+
+        Move move = currentPlayer->getMove();
+        move.color = currentColor;
+
         if (game.move(move)) {
             std::cout << "Moved!\n";
             game.changeTurn();

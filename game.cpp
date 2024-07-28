@@ -22,14 +22,10 @@ void ChessGame::startGame() {
 }
 
 void ChessGame::resign() {
-    if (turn == White) {
-        gameState = ResignedWhite;
-    } else {
-        gameState = ResignedBlack;
-    }
+    gameState = turn == White ? ResignedWhite : ResignedBlack;
 }
 
-bool ChessGame::isValidMove(const Move &move, const Board &board) const {
+bool ChessGame::isValidMove(PieceColor turn, const Move &move, const Board &board) const {
     std::shared_ptr<Piece> piece = board.getPieceAt(move.oldRow, move.oldCol);
 
     if (!withinBoard(move.newRow, move.newCol) || !piece->isMoveValid(move) ||
@@ -123,14 +119,25 @@ bool ChessGame::isValidMove(const Move &move, const Board &board) const {
 }
 
 bool ChessGame::move(const Move &move) {
-    if (!isValidMove(move, *board)) {
+    if (!isValidMove(turn, move, *board)) {
         return false;
     }
 
-    // TODO: return false if move results in a check
-    // TODO: castling
+    Board preliminaryBoard = Board(*board);
+    preliminaryBoard.move(move);
+
+    // check if move puts king in check
+    std::vector<Move> opponentMoves = generateLegalMovesInternal(turn == White ? Black : White, preliminaryBoard);
+    for(const auto &m: opponentMoves) {
+        if(isCheckInternal(m, preliminaryBoard)) {
+            return false;
+        }
+    }
+
+    // TODO: castling 
     // TODO: en passant
     // TODO: pawn promotion
+
     // TODO: set game state
 
     board->move(move);
@@ -145,31 +152,37 @@ GameState ChessGame::getState() const {
 PieceColor ChessGame::getTurn() const { return turn; }
 
 void ChessGame::changeTurn() {
-    if (turn == White) {
-        turn = Black;
-    } else {
-        turn = White;
-    }
+    turn = turn == White ? Black : White;
 }
 
+// TODO: implement
 void ChessGame::computeState() const {}
 
 std::vector<Move>
-ChessGame::generateLegalMovesInternal(PieceColor color) const {
-    return {};
+ChessGame::generateLegalMovesInternal(PieceColor color, const Board &board) const {
+    std::vector<Move> legalMoves = {};
+
+    for(int i=0; i<8; ++i) {
+        for(int j=0; j<8; ++j) {
+            for(int k=0; k<8; ++k) {
+                for(int l=0; l<8; l++) {
+                    Move move = Move{i, j, k, l, color};
+                    if(isValidMove(color, move, board)) {
+                        legalMoves.push_back(move);
+                    }
+                }
+            }
+        }
+    }
 }
 
 std::vector<Move> ChessGame::generateLegalMoves() const {
-    std::vector<Move> legalMoves =  turn == White ? generateLegalMovesInternal(White)
-                         : generateLegalMovesInternal(Black);
+    std::vector<Move> legalMoves =  turn == White ? generateLegalMovesInternal(White, *board)
+                         : generateLegalMovesInternal(Black, *board);
 
     std::vector<Move> nonCheckLegalMoves = {};
 
-    for(const auto &m: legalMoves) {
-        if(!isCheckInternal(m, *board)) {
-            nonCheckLegalMoves.push_back(m);
-        }
-    }
+    // TODO: remove legal moves that put king in check
 
     return nonCheckLegalMoves;
 }
@@ -179,7 +192,8 @@ bool ChessGame::isCaptureInternal(const Move &move, const Board &board) const {
 }
 
 bool ChessGame::isCheckInternal(const Move &move, const Board &board) const {
-    return false;
+    std::pair<int, int> king = findKing(move.color == White ? Black : White, board);
+    return move.newRow == king.first && move.newCol == king.second;
 }
 
 bool ChessGame::isCapture(const Move &move) const {

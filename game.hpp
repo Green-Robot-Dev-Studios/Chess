@@ -29,11 +29,11 @@ class ChessGame {
     void computeState() const;
     std::pair<int, int> findKing(PieceColor color, const Board &board) const;
 
-    bool isValidMove(const Move &move, const Board &board) const;
+    bool isValidMove(PieceColor turn, const Move &move, const Board &board) const;
 
     bool isCaptureInternal(const Move &move, const Board &board) const;
     bool isCheckInternal(const Move &move, const Board &board) const;
-    std::vector<Move> generateLegalMovesInternal(PieceColor color) const;
+    std::vector<Move> generateLegalMovesInternal(PieceColor color, const Board &board) const;
 
 public:
     ChessGame(std::shared_ptr<Board> board) : board(board) {};
