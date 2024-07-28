@@ -8,24 +8,44 @@ bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
 }
 
-void ChessGame::setPlayers(std::shared_ptr<Player> white,
-                           std::shared_ptr<Player> black) {
-    this->whitePlayer = white;
-    this->blackPlayer = black;
+// computes stalemate
+void ChessGame::computeState(){
+    if (gameState != (turn == White ? CheckForBlack : CheckForWhite) && generateLegalMoves().size() == 0) {
+        gameState = Stalemate;
+    }
 }
 
-void ChessGame::startGame() {
-    gameState = Ongoing;
-    moveList.clear();
-    turn = White;
-    board->resetBoard();
+std::pair<int, int> ChessGame::findKing(PieceColor color,
+                                        const Board &board) const {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            std::shared_ptr<Piece> piece = board.getPieceAt(i, j);
+            if (std::dynamic_pointer_cast<King>(piece) &&
+                piece->getColor() == color) {
+                return std::make_pair(i, j);
+            }
+        }
+    }
+
+    return std::make_pair(-1, -1);
 }
 
-void ChessGame::resign() {
-    gameState = turn == White ? ResignedWhite : ResignedBlack;
+bool ChessGame::isKingInCheck(PieceColor kingColor, const Board &board) const {
+    std::vector<Move> opponentMoves =
+        generateLegalMovesInternal(kingColor == White ? Black : White, board);
+
+    std::pair<int, int> king = findKing(kingColor, board);
+    for (const auto &m : opponentMoves) {
+        if (isCheckInternal(m, king)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
-bool ChessGame::isValidMove(PieceColor turn, const Move &move, const Board &board) const {
+bool ChessGame::isValidMove(PieceColor turn, const Move &move,
+                            const Board &board) const {
     std::shared_ptr<Piece> piece = board.getPieceAt(move.oldRow, move.oldCol);
 
     if (!withinBoard(move.newRow, move.newCol) || !piece->isMoveValid(move) ||
@@ -118,6 +138,43 @@ bool ChessGame::isValidMove(PieceColor turn, const Move &move, const Board &boar
     return true;
 }
 
+bool ChessGame::isCaptureInternal(const Move &move, const Board &board) const {
+    return board.getPieceAt(move.newRow, move.newCol) != nullptr;
+}
+
+bool ChessGame::isCheckInternal(const Move &move,
+                                std::pair<int, int> king) const {
+    return move.newRow == king.first && move.newCol == king.second;
+}
+
+std::vector<Move>
+ChessGame::generateLegalMovesInternal(PieceColor color,
+                                      const Board &board) const {
+    std::vector<Move> legalMoves = {};
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            for (int k = 0; k < 8; ++k) {
+                for (int l = 0; l < 8; l++) {
+                    Move move = Move{i, j, k, l, color};
+                    if (isValidMove(color, move, board)) {
+                        legalMoves.push_back(move);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void ChessGame::startGame() {
+    gameState = Ongoing;
+    moveList.clear();
+    turn = White;
+    board->resetBoard();
+}
+
+void ChessGame::changeTurn() { turn = turn == White ? Black : White; }
+
 bool ChessGame::move(const Move &move) {
     if (!isValidMove(turn, move, *board)) {
         return false;
@@ -127,73 +184,80 @@ bool ChessGame::move(const Move &move) {
     preliminaryBoard.move(move);
 
     // check if move puts king in check
-    std::vector<Move> opponentMoves = generateLegalMovesInternal(turn == White ? Black : White, preliminaryBoard);
-    for(const auto &m: opponentMoves) {
-        if(isCheckInternal(m, preliminaryBoard)) {
-            return false;
-        }
+    if (isKingInCheck(turn, preliminaryBoard)) {
+        return false;
     }
 
-    // TODO: castling 
+    // TODO: castling
     // TODO: en passant
     // TODO: pawn promotion
 
-    // TODO: set game state
+    // compute game state
+
+    // check if move puts opponents king in check
+    if (isKingInCheck(turn == White ? Black : White, preliminaryBoard)) {
+        gameState = turn == White ? CheckForWhite : CheckForBlack;
+
+        std::vector<Move> opponentMoves = generateLegalMovesInternal(
+            turn == White ? Black : White, preliminaryBoard);
+
+        // if none of these moves result in opponent being out of check ->
+        // checkmate
+        bool outOfCheck = false;
+        for (const auto &m : opponentMoves) {
+            Board preliminaryOpponentBoard = Board(preliminaryBoard);
+            preliminaryOpponentBoard.move(m);
+
+            if (!isKingInCheck(turn == White ? Black : White,
+                               preliminaryOpponentBoard)) {
+                outOfCheck = true;
+                break;
+            }
+        }
+
+        if (!outOfCheck) {
+            gameState = turn == White ? CheckmateForWhite : CheckmateForBlack;
+        }
+    }
 
     board->move(move);
     return true;
 }
 
-GameState ChessGame::getState() const { 
-    computeState();
-    return gameState; 
+void ChessGame::resign() {
+    gameState = turn == White ? ResignedWhite : ResignedBlack;
+}
+
+GameState ChessGame::getState() const {
+    return gameState;
 }
 
 PieceColor ChessGame::getTurn() const { return turn; }
 
-void ChessGame::changeTurn() {
-    turn = turn == White ? Black : White;
-}
-
-// TODO: implement
-void ChessGame::computeState() const {}
-
-std::vector<Move>
-ChessGame::generateLegalMovesInternal(PieceColor color, const Board &board) const {
-    std::vector<Move> legalMoves = {};
-
-    for(int i=0; i<8; ++i) {
-        for(int j=0; j<8; ++j) {
-            for(int k=0; k<8; ++k) {
-                for(int l=0; l<8; l++) {
-                    Move move = Move{i, j, k, l, color};
-                    if(isValidMove(color, move, board)) {
-                        legalMoves.push_back(move);
-                    }
-                }
-            }
-        }
-    }
-}
-
 std::vector<Move> ChessGame::generateLegalMoves() const {
-    std::vector<Move> legalMoves =  turn == White ? generateLegalMovesInternal(White, *board)
-                         : generateLegalMovesInternal(Black, *board);
+    std::vector<Move> legalMoves =
+        turn == White ? generateLegalMovesInternal(White, *board)
+                      : generateLegalMovesInternal(Black, *board);
 
     std::vector<Move> nonCheckLegalMoves = {};
 
-    // TODO: remove legal moves that put king in check
+    // remove moves that put king into check
+    for (const auto &m : legalMoves) {
+        Board preliminaryBoard = Board(*board);
+        preliminaryBoard.move(m);
+
+        if (!isKingInCheck(turn, preliminaryBoard)) {
+            nonCheckLegalMoves.push_back(m);
+        }
+    }
 
     return nonCheckLegalMoves;
 }
 
-bool ChessGame::isCaptureInternal(const Move &move, const Board &board) const {
-    return board.getPieceAt(move.newRow, move.newCol) != nullptr;
-}
-
-bool ChessGame::isCheckInternal(const Move &move, const Board &board) const {
-    std::pair<int, int> king = findKing(move.color == White ? Black : White, board);
-    return move.newRow == king.first && move.newCol == king.second;
+void ChessGame::setPlayers(std::shared_ptr<Player> white,
+                           std::shared_ptr<Player> black) {
+    this->whitePlayer = white;
+    this->blackPlayer = black;
 }
 
 bool ChessGame::isCapture(const Move &move) const {
@@ -201,20 +265,6 @@ bool ChessGame::isCapture(const Move &move) const {
 }
 
 bool ChessGame::isCheck(const Move &move) const {
-    return isCheckInternal(move, *board);
-}
-
-std::pair<int, int> ChessGame::findKing(PieceColor color,
-                                        const Board &board) const {
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            std::shared_ptr<Piece> piece = board.getPieceAt(i, j);
-            if (std::dynamic_pointer_cast<King>(piece) &&
-                piece->getColor() == color) {
-                return std::make_pair(i, j);
-            }
-        }
-    }
-
-    return std::make_pair(-1, -1);
+    return isCheckInternal(
+        move, findKing(move.color == White ? Black : White, *board));
 }
