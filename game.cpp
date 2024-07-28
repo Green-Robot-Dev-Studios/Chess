@@ -205,6 +205,20 @@ bool ChessGame::isCheck(const Move &move) const {
     return isCheckInternal(move, *board);
 }
 
+bool ChessGame::isMoveSafe(const Move &move) const {
+    Board testBoard = Board(*board);
+    testBoard.move(move);
+
+    std::vector<Move> opponentMoves = generateLegalMovesInternal(move.color == White ? Black : White, testBoard);
+    for(const auto &m: opponentMoves) {
+        if(isCaptureInternal(m, testBoard)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::pair<int, int> ChessGame::findKing(PieceColor color,
                                         const Board &board) const {
     for (int i = 0; i < 8; ++i) {
