@@ -1,4 +1,5 @@
 #include "text_view.hpp"
+#include <cstdio>
 
 void TextView::draw() {
     printf("=============== Printing Chess Board ===============\n");

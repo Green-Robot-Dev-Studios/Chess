@@ -13,8 +13,8 @@ class Board: public Subject {
 public:
     void resetBoard();
     void move(const Move &move);
-    std::shared_ptr<Piece> getPieceAt(int, int);
-    std::vector<std::vector<Square>> getState();
+    std::shared_ptr<Piece> getPieceAt(int, int) const;
+    std::vector<std::vector<Square>> getState() const;
 };
 
 #endif

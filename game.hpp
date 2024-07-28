@@ -26,28 +26,36 @@ class ChessGame {
     std::vector<Move> moveList;
     GameState gameState;
 
-    void calculateState();
-    std::pair<int, int> findKing(PieceColor color);
-    std::vector<Move> generateLegalMovesInternal(PieceColor color);
+    void computeState() const;
+    std::pair<int, int> findKing(PieceColor color, const Board &board) const;
+
+    bool isValidMove(const Move &move, const Board &board) const;
+
+    bool isCaptureInternal(const Move &move, const Board &board) const;
+    bool isCheckInternal(const Move &move, const Board &board) const;
+    std::vector<Move> generateLegalMovesInternal(PieceColor color) const;
 
 public:
-    ChessGame(std::shared_ptr<Board> board): board(board) {};
-    ChessGame(std::shared_ptr<Board> board, std::shared_ptr<Player> whitePlayer, std::shared_ptr<Player> blackPlayer) : board(board), whitePlayer(whitePlayer), blackPlayer(blackPlayer) {};
-    void setPlayers(std::shared_ptr<Player> white, std::shared_ptr<Player> black);
+    ChessGame(std::shared_ptr<Board> board) : board(board) {};
+    ChessGame(std::shared_ptr<Board> board, std::shared_ptr<Player> whitePlayer,
+              std::shared_ptr<Player> blackPlayer)
+        : board(board), whitePlayer(whitePlayer), blackPlayer(blackPlayer) {};
+
     void startGame();
-    /* ****************** */
-    // TODO: why do we need this?
-    // void endGame();
-    /* ****************** */
-    void resign();
-    bool move(const Move &move);
-    GameState getState();
-    PieceColor getTurn();
     void changeTurn();
-    std::vector<Move> generateLegalMoves();
-    bool isCapture(const Move &move);
-    bool isCheck(const Move &move);
-    bool isMoveSafe(const Move &move);
+    bool move(const Move &move);
+    void resign();
+
+    GameState getState() const;
+    PieceColor getTurn() const;
+    std::vector<Move> generateLegalMoves() const;
+
+    void setPlayers(std::shared_ptr<Player> white,
+                    std::shared_ptr<Player> black);
+
+    bool isCapture(const Move &move) const;
+    bool isCheck(const Move &move) const;
+    bool isMoveSafe(const Move &move) const;
 };
 
 #endif

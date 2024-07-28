@@ -102,12 +102,13 @@ bool Pawn::isMoveValidInternal(const Move &move) {
     return dx <= 1 && dy <= 1;
 }
 
-// King should move one unit in any direction
+// King should move one unit in any direction (unless castling)
 bool King::isMoveValidInternal(const Move &move) {
     int dx = abs(move.newCol - move.oldCol);
     int dy = abs(move.newRow - move.oldRow);
 
-    return dx <= 1 && dy <= 1;
+    // castling
+    return (dx == 2 && dy == 0) || (dx <= 1 && dy <= 1);
 }
 
 // Queen should EITHER move same magnitude in both axes, or only moved in one axis
