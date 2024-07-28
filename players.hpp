@@ -4,6 +4,8 @@
 #include "move.hpp"
 #include "game.hpp"
 
+const int MAX_DEPTH = 3;
+
 class Player {
 protected:
     PieceColor color;
@@ -44,6 +46,8 @@ public:
 };
 
 class Level4 : public Computer {
+    Move bestMove;
+    int minimax(ChessGame& game, int depth, int alpha, int beta, bool maximizingPlayer);
 public:
     Level4(PieceColor color, ChessGame* game) : Computer(color, game) {}
     Move getMove() override;

@@ -3,6 +3,7 @@
 #include "pieces.hpp"
 #include <cmath>
 #include <memory>
+#include <map>
 
 bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
@@ -217,4 +218,34 @@ std::pair<int, int> ChessGame::findKing(PieceColor color,
     }
 
     return std::make_pair(-1, -1);
+}
+
+int ChessGame::evaluateBoard(PieceColor color) const {
+    int materialScore = 0;
+
+    // Define piece values
+    std::map<char, int> pieceValues = {
+        {'k', 10000},
+        {'q', 900},
+        {'r', 500},
+        {'b', 330},
+        {'n', 320},
+        {'p', 100}
+    };
+
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            const std::shared_ptr<Piece> piece = board->getPieceAt(row, col);
+            if (piece != nullptr) {
+                int pieceValue = pieceValues[piece->getLetter()];
+                if (piece->getColor() == color) {
+                    materialScore += pieceValue;
+                } else {
+                    materialScore -= pieceValue;
+                }
+            }
+        }
+    }
+
+    return materialScore;
 }
