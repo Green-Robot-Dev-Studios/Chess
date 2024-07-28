@@ -272,6 +272,20 @@ bool ChessGame::isCheck(const Move &move) const {
     return isKingInCheck(move.color == White ? Black : White, preliminaryBoard);
 }
 
+bool ChessGame::isMoveSafe(const Move &move) const {
+    Board testBoard = Board(*board);
+    testBoard.move(move);
+
+    std::vector<Move> opponentMoves = generateLegalMovesInternal(move.color == White ? Black : White, testBoard);
+    for(const auto &m: opponentMoves) {
+        if(isCaptureInternal(m, testBoard)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 int ChessGame::evaluateBoard(PieceColor color) const {
     int materialScore = 0;
 
