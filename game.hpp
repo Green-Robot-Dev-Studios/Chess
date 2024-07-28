@@ -10,12 +10,13 @@ class Player;
 
 enum GameState {
     Ongoing = 0,
-    Check = 1,
-    CheckmateWhite = 2,
-    CheckmateBlack = 3,
-    Stalemate = 4,
-    ResignedWhite = 5,
-    ResignedBlack = 6
+    CheckForWhite = 1,
+    CheckForBlack = 2,
+    CheckmateForWhite = 3,
+    CheckmateForBlack = 4,
+    Stalemate = 5,
+    ResignedWhite = 6,
+    ResignedBlack = 7
 };
 
 class ChessGame {
@@ -26,13 +27,14 @@ class ChessGame {
     std::vector<Move> moveList;
     GameState gameState;
 
-    void computeState() const;
+    void computeState();
     std::pair<int, int> findKing(PieceColor color, const Board &board) const;
 
+    bool isKingInCheck(PieceColor kingColor, const Board &board) const;
     bool isValidMove(PieceColor turn, const Move &move, const Board &board) const;
 
     bool isCaptureInternal(const Move &move, const Board &board) const;
-    bool isCheckInternal(const Move &move, const Board &board) const;
+    bool isCheckInternal(const Move &move, std::pair<int, int> king) const;
     std::vector<Move> generateLegalMovesInternal(PieceColor color, const Board &board) const;
 
 public:
