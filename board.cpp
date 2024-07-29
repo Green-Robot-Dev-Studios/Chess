@@ -71,6 +71,26 @@ void Board::move(const Move &move) {
     notifyObservers();
 }
 
+void Board::enPassantMove(const Move &move) {
+    // Get the piece at the source square
+    std::shared_ptr<Piece> piece = board[move.oldRow][move.oldCol].getPiece();
+
+    // Update piece fields
+    piece->move(move);
+
+    // Move the piece to the destination square
+    board[move.newRow][move.newCol].setPiece(piece);
+
+    // Clear the source square
+    board[move.oldRow][move.oldCol].removePiece();
+
+    // Clear the neighboring square
+    int neighborCol = move.oldCol + (move.newCol - move.oldCol) / abs(move.newCol - move.oldCol);
+    board[move.oldRow][neighborCol].removePiece();
+
+    notifyObservers();
+}
+
 std::shared_ptr<Piece> Board::getPieceAt(int row, int col) const {
     return board[row][col].getPiece();
 }

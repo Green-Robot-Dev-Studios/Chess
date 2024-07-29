@@ -19,9 +19,15 @@ int main() {
     TextView view = TextView(board);
     board->notifyObservers();
 
+    // TODO: graceful exit on ctrl + D
+
     while (game.getState() == Ongoing || game.getState() == CheckForBlack || game.getState() == CheckForWhite) {
         if (game.getState() == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {
-            std::cout << "Warning, you are in check!" << std::endl;
+            if(game.getTurn() == White) {
+                std::cout << "White is in check." << std::endl;
+            } else {
+                std::cout << "Black is in check." << std::endl;
+            }
         }
 
         PieceColor currentColor = game.getTurn();
@@ -31,18 +37,18 @@ int main() {
         move.color = currentColor;
 
         if (game.move(move)) {
-            std::cout << "Moved!\n";
+            std::cout << "Moved!" << std::endl;
             game.changeTurn();
         } else {
-            std::cout << "Invalid move!\n";
+            std::cout << "Invalid move!" << std::endl;
         }
     }
 
-    if (game.getState() == CheckmateForWhite) std::cout << "Black in checkmate!\n";
-    if (game.getState() == CheckmateForBlack) std::cout << "White in checkmate!\n";
-    if (game.getState() == ResignedWhite) std::cout << "White resigns!\n";
-    if (game.getState() == ResignedBlack) std::cout << "Black resigns!\n";
-    if (game.getState() == Stalemate) std::cout << "Stalemate!\n";
+    if (game.getState() == CheckmateForWhite) std::cout << "Checkmate! White wins!" << std::endl;
+    if (game.getState() == CheckmateForBlack) std::cout << "Checkmate! Black wins!" << std::endl;
+    if (game.getState() == ResignedWhite) std::cout << "Black wins!" << std::endl;
+    if (game.getState() == ResignedBlack) std::cout << "White wins!" << std::endl;
+    if (game.getState() == Stalemate) std::cout << "Stalemate!" << std::endl;
 
     return 0;
 }

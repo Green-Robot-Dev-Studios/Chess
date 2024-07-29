@@ -2,6 +2,9 @@ checklist:
 - for each piece type
     a. valid move on piece itself
     b. game logic valid move
+        1. castling
+        2. en passant
+        3. pawn promotion
 
 - can't make a move that puts your king in check
 
@@ -10,3 +13,4 @@ checklist:
     b. moving other piece in the way
     c. moving the king
 
+- checkmate and stalemate tests can be made once the command interpreter is done

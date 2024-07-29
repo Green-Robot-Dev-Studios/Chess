@@ -81,8 +81,8 @@ bool ChessGame::isValidMove(PieceColor turn, const Move &move,
         int i = move.oldRow;
         int j = move.oldCol;
 
-        while(i != move.newRow || j != move.newCol) {
-            if(i == move.oldRow && j == move.oldCol) {
+        while (i != move.newRow || j != move.newCol) {
+            if (i == move.oldRow && j == move.oldCol) {
                 i += dy == 0 ? 0 : (move.newRow - move.oldRow) / dy;
                 j += dx == 0 ? 0 : (move.newCol - move.oldCol) / dx;
                 continue;
@@ -96,7 +96,8 @@ bool ChessGame::isValidMove(PieceColor turn, const Move &move,
             j += dx == 0 ? 0 : (move.newCol - move.oldCol) / dx;
         }
 
-        if(std::dynamic_pointer_cast<Pawn>(piece) && dx == 0 && board.getPieceAt(move.newRow, move.newCol) != nullptr) {
+        if (std::dynamic_pointer_cast<Pawn>(piece) && dx == 0 &&
+            board.getPieceAt(move.newRow, move.newCol) != nullptr) {
             return false;
         }
     }
@@ -109,40 +110,54 @@ bool ChessGame::isValidMove(PieceColor turn, const Move &move,
 
         // check that only a capture move may be diagonal
         if (dy > 0 && dx > 0 && nextPiece == nullptr) {
+            // special case for en passant
+            int neighborCol = move.oldCol + (move.newCol - move.oldCol) / dx;
+            if (withinBoard(move.oldRow, neighborCol)) {
+                std::shared_ptr<Piece> neighborPiece =
+                    board.getPieceAt(move.oldRow, neighborCol);
+
+                // need to check that piece beside it is a pawn, and has
+                // advanced two positions in the opponent's last turn
+                if (std::dynamic_pointer_cast<Pawn>(neighborPiece) &&
+                    moveList.size() > 0) {
+                    Move lastMove = moveList.back();
+
+                    if (lastMove.newRow == move.oldRow &&
+                        lastMove.newCol == neighborCol &&
+                        abs(lastMove.newRow - lastMove.oldRow) == 2) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    if (std::dynamic_pointer_cast<King>(piece) && dx == 2) {
+        bool direction = (move.newCol - move.oldCol) < 0;
+        std::shared_ptr<Piece> nextPiece =
+            turn == White
+                ? (direction ? board.getPieceAt(7, 0) : board.getPieceAt(7, 7))
+                : (direction ? board.getPieceAt(0, 0) : board.getPieceAt(0, 7));
+
+        // check that rook exists
+        if (nextPiece == nullptr ||
+            !std::dynamic_pointer_cast<Rook>(nextPiece)) {
             return false;
         }
 
-        // TODO: en passant
-    }
+        // check that king and rook haven't moved
+        if (piece->getMoveCount() > 0 || nextPiece->getMoveCount() > 0) {
+            return false;
+        }
 
-    if (std::dynamic_pointer_cast<King>(piece)) {
-        // check castling conditions
-        if (dx == 2) {
-            bool direction = (move.newCol - move.oldCol) < 0;
-            std::shared_ptr<Piece> nextPiece =
-                turn == White ? (direction ? board.getPieceAt(7, 0)
-                                           : board.getPieceAt(7, 7))
-                              : (direction ? board.getPieceAt(0, 0)
-                                           : board.getPieceAt(0, 7));
-
-            // check that rook exists
-            if (nextPiece == nullptr ||
-                !std::dynamic_pointer_cast<Rook>(nextPiece)) {
+        // check that there are no pieces in between
+        for (int j = move.oldCol; j != nextPiece->getCol();
+             j += (move.newCol - move.oldCol) / dx) {
+            if (j != move.oldCol && j != nextPiece->getCol() &&
+                board.getPieceAt(move.oldRow, j) != nullptr) {
                 return false;
-            }
-
-            // check that king and rook haven't moved
-            if (piece->getMoveCount() > 0 || nextPiece->getMoveCount() > 0) {
-                return false;
-            }
-
-            // check that there are no pieces in between
-            for (int j = move.oldCol; j != nextPiece->getCol();
-                 j += (move.newCol - move.oldCol) / dx) {
-                if (j != nextPiece->getCol() &&
-                    board.getPieceAt(move.oldRow, j) != nullptr) {
-                    return false;
-                }
             }
         }
     }
@@ -194,17 +209,82 @@ bool ChessGame::move(const Move &move) {
         return false;
     }
 
+    std::shared_ptr<Piece> piece = board->getPieceAt(move.oldRow, move.oldCol);
+
+    std::shared_ptr<Piece> nextPiece =
+        board->getPieceAt(move.newRow, move.newCol);
+
+    int dy = abs(move.newRow - move.oldRow);
+    int dx = abs(move.newCol - move.oldCol);
+
     Board preliminaryBoard = Board(*board);
-    preliminaryBoard.move(move);
 
-    // check if move puts king in check
-    if (isKingInCheck(turn, preliminaryBoard)) {
-        return false;
+    // en passant
+    if (std::dynamic_pointer_cast<Pawn>(piece) && dy > 0 && dx > 0 &&
+        nextPiece == nullptr) {
+            preliminaryBoard.move(move);
+
+            if (isKingInCheck(turn, preliminaryBoard)) {
+                return false;
+            }
+
+            board->enPassantMove(move);
+
+            moveList.push_back(move);
+
+    // castling
+    } else if (std::dynamic_pointer_cast<King>(piece) && dx == 2) {
+        // initial position
+        if (isKingInCheck(turn, preliminaryBoard)) {
+            return false;
+        }
+
+        Move intermediate =
+            Move{move.oldRow, move.oldCol, move.newRow,
+                 move.oldCol + (move.newCol - move.oldCol) / dx};
+        preliminaryBoard.move(intermediate);
+
+        // intermediate position
+        if (isKingInCheck(turn, preliminaryBoard)) {
+            return false;
+        }
+
+        Move final =
+            Move{intermediate.newRow, intermediate.newCol, intermediate.newRow,
+                 intermediate.newCol + (move.newCol - move.oldCol) / dx};
+        preliminaryBoard.move(final);
+
+        // final position
+        if (isKingInCheck(turn, preliminaryBoard)) {
+            return false;
+        }
+
+        bool direction = (move.newCol - move.oldCol) < 0;
+        std::pair<int, int> rook =
+            turn == White
+                ? (direction ? std::make_pair(7, 0) : std::make_pair(7, 7))
+                : (direction ? std::make_pair(0, 0) : std::make_pair(0, 7));
+
+        Move rookMove = Move{rook.first, rook.second, rook.first,
+                             move.oldCol + (move.newCol - move.oldCol) / dx};
+
+        board->move(move);
+        board->move(rookMove);
+
+        moveList.push_back(move);
+
+    } else {
+        preliminaryBoard.move(move);
+
+        // check if move puts king in check
+        if (isKingInCheck(turn, preliminaryBoard)) {
+            return false;
+        }
+
+        board->move(move);
+
+        moveList.push_back(move);
     }
-
-    // TODO: castling
-    // TODO: en passant
-    // TODO: pawn promotion
 
     // compute game state
     // check if move puts opponents king in check
@@ -233,12 +313,12 @@ bool ChessGame::move(const Move &move) {
         }
     }
 
-    board->move(move);
-    
     // reset game state to ongoing if escaped check
-    if(gameState == (turn == White ? CheckForBlack : CheckForWhite)) {
+    if (gameState == (turn == White ? CheckForBlack : CheckForWhite)) {
         gameState = Ongoing;
     }
+
+    // TODO: pawn promotion
 
     return true;
 }
