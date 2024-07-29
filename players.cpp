@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <time.h>
 #include "players.hpp"
 #include "game.hpp"
 
@@ -64,6 +65,10 @@ Move Level3::getMove() {
         if (game->isCapture(move)) {
             preferredMoves.push_back(move);
         }
+    }
+
+    if (preferredMoves.size() > 0) {
+        return preferredMoves[rand() % preferredMoves.size()];
     }
 
     // avoid captures checks

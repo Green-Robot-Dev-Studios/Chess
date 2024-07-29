@@ -30,6 +30,8 @@ int main() {
     int whiteCount = 0;
     int blackCount = 0;
 
+    srand(time(0));
+
     while (std::cin >> command) {
         if (command == "game") {
             board->notifyObservers();
@@ -95,7 +97,7 @@ int main() {
                         std::cout << "Moved!" << std::endl;
                         game.changeTurn();
                     } else {
-                        std::cout << "Invalid move by AI!" << std::endl;
+                        std::cout << "Invalid move by Computer!" << std::endl;
                         continue;
                     }
                 } else {

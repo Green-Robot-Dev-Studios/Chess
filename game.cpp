@@ -5,14 +5,15 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <utility>
 
 bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
 }
 
-// computes stalemate
-void ChessGame::computeState() {
+void ChessGame::computeStalemate(PieceColor turn) {
     if (gameState != (turn == White ? CheckForBlack : CheckForWhite) &&
+        gameState != (turn == White ? CheckmateForBlack : CheckmateForWhite) &&
         generateLegalMoves().size() == 0) {
         gameState = Stalemate;
     }
@@ -169,6 +170,10 @@ bool ChessGame::isCaptureInternal(const Move &move, const Board &board) const {
     return board.getPieceAt(move.newRow, move.newCol) != nullptr;
 }
 
+bool ChessGame::isCaptureTargetInternal(const Move &move, std::pair<int, int> target) const {
+    return move.newRow == target.first && move.newCol == target.second;
+}
+
 bool ChessGame::isCheckInternal(const Move &move,
                                 std::pair<int, int> king) const {
     return move.newRow == king.first && move.newCol == king.second;
@@ -221,17 +226,17 @@ bool ChessGame::moveInternal(const Move &move) {
     // en passant
     if (std::dynamic_pointer_cast<Pawn>(piece) && dy > 0 && dx > 0 &&
         nextPiece == nullptr) {
-            preliminaryBoard.move(move);
+        preliminaryBoard.move(move);
 
-            if (isKingInCheck(turn, preliminaryBoard)) {
-                return false;
-            }
+        if (isKingInCheck(turn, preliminaryBoard)) {
+            return false;
+        }
 
-            board->enPassantMove(move);
+        board->enPassantMove(move);
 
-            moveList.push_back(move);
+        moveList.push_back(move);
 
-    // castling
+        // castling
     } else if (std::dynamic_pointer_cast<King>(piece) && dx == 2) {
         // initial position
         if (isKingInCheck(turn, preliminaryBoard)) {
@@ -286,6 +291,7 @@ bool ChessGame::moveInternal(const Move &move) {
     }
 
     // compute game state
+
     // check if move puts opponents king in check
     if (isKingInCheck(turn == White ? Black : White, preliminaryBoard)) {
         gameState = turn == White ? CheckForWhite : CheckForBlack;
@@ -312,6 +318,8 @@ bool ChessGame::moveInternal(const Move &move) {
         }
     }
 
+    computeStalemate(turn == White ? Black : White);
+
     // reset game state to ongoing if escaped check
     if (gameState == (turn == White ? CheckForBlack : CheckForWhite)) {
         gameState = Ongoing;
@@ -320,12 +328,11 @@ bool ChessGame::moveInternal(const Move &move) {
     return true;
 }
 
-bool ChessGame::move(const Move &move) {
-    return moveInternal(move);
-}
+bool ChessGame::move(const Move &move) { return moveInternal(move); }
 
-bool ChessGame::movePromotion(const Move &move, std::shared_ptr<Piece> promotedPiece) {
-    if(moveInternal(move)) {
+bool ChessGame::movePromotion(const Move &move,
+                              std::shared_ptr<Piece> promotedPiece) {
+    if (moveInternal(move)) {
         board->promotionMove(move, promotedPiece);
         return true;
     }
@@ -350,12 +357,53 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
 
     // remove moves that put king into check
     for (const auto &m : legalMoves) {
-        Board preliminaryBoard = Board(*board);
-        preliminaryBoard.move(m);
+        std::shared_ptr<Piece> piece = board->getPieceAt(m.oldRow, m.oldCol);
 
-        if (!isKingInCheck(turn, preliminaryBoard)) {
-            nonCheckLegalMoves.push_back(m);
+        std::shared_ptr<Piece> nextPiece =
+            board->getPieceAt(m.newRow, m.newCol);
+
+        int dy = abs(m.newRow - m.oldRow);
+        int dx = abs(m.newCol - m.oldCol);
+
+        Board preliminaryBoard = Board(*board);
+
+        // castling
+        if (std::dynamic_pointer_cast<King>(piece) && dx == 2) {
+            // initial position
+            if (isKingInCheck(turn, preliminaryBoard)) {
+                continue;
+            }
+
+            Move intermediate =
+                Move{m.oldRow, m.oldCol, m.newRow,
+                    m.oldCol + (m.newCol - m.oldCol) / dx};
+            preliminaryBoard.move(intermediate);
+
+            // intermediate position
+            if (isKingInCheck(turn, preliminaryBoard)) {
+                continue;
+            }
+
+            Move final =
+                Move{intermediate.newRow, intermediate.newCol, intermediate.newRow,
+                    intermediate.newCol + (m.newCol - m.oldCol) / dx};
+            preliminaryBoard.move(final);
+
+            // final position
+            if (isKingInCheck(turn, preliminaryBoard)) {
+                continue;
+            }
+
+        } else {
+            preliminaryBoard.move(m);
+
+            // check if move puts king in check
+            if (isKingInCheck(turn, preliminaryBoard)) {
+                continue;
+            }
         }
+
+        nonCheckLegalMoves.push_back(m);
     }
 
     return nonCheckLegalMoves;
@@ -386,11 +434,17 @@ bool ChessGame::isMoveSafe(const Move &move) const {
 
     std::vector<Move> opponentMoves = generateLegalMovesInternal(
         move.color == White ? Black : White, testBoard);
+
+    std::cout << "For move: " << move.oldRow << move.oldCol << move.newRow << move.newCol << std::endl;
+
     for (const auto &m : opponentMoves) {
-        if (isCaptureInternal(m, testBoard)) {
+        if (isCaptureTargetInternal(m, std::make_pair(move.newRow, move.newCol))) {
+            std::cout << "captured by: " << m.oldRow << m.oldCol << std::endl;
             return false;
         }
     }
+
+    std::cout << "good" << std::endl;
 
     return true;
 }

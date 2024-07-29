@@ -3,6 +3,7 @@
 
 #include "board.hpp"
 #include "move.hpp"
+#include "pieces.hpp"
 
 #include <vector>
 
@@ -34,6 +35,7 @@ class ChessGame {
     bool isValidMove(PieceColor turn, const Move &move, const Board &board) const;
 
     bool isCaptureInternal(const Move &move, const Board &board) const;
+    bool isCaptureTargetInternal(const Move &move, std::pair<int, int> target) const;
     bool isCheckInternal(const Move &move, std::pair<int, int> king) const;
 
     bool moveInternal(const Move &move);
@@ -49,7 +51,7 @@ public:
     void changeTurn();
     void resign();
 
-    void computeState();
+    void computeStalemate(PieceColor turn);
     std::pair<int, int> findKing(PieceColor color, const Board &board) const;
 
     bool move(const Move &move);
