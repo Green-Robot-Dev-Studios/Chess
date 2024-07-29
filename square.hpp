@@ -11,6 +11,7 @@ class Square {
     std::shared_ptr<Piece> piece;
 public:
     Square(int r, int c);
+    Square(const Square& other);
     bool isOccupied() const;
     std::shared_ptr<Piece> getPiece() const;
     void setPiece(const std::shared_ptr<Piece>& p);

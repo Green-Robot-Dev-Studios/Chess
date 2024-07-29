@@ -2,16 +2,18 @@
 #include "move.hpp"
 #include "pieces.hpp"
 #include <cmath>
-#include <memory>
+#include <iostream>
 #include <map>
+#include <memory>
 
 bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
 }
 
 // computes stalemate
-void ChessGame::computeState(){
-    if (gameState != (turn == White ? CheckForBlack : CheckForWhite) && generateLegalMoves().size() == 0) {
+void ChessGame::computeState() {
+    if (gameState != (turn == White ? CheckForBlack : CheckForWhite) &&
+        generateLegalMoves().size() == 0) {
         gameState = Stalemate;
     }
 }
@@ -47,9 +49,14 @@ bool ChessGame::isKingInCheck(PieceColor kingColor, const Board &board) const {
 
 bool ChessGame::isValidMove(PieceColor turn, const Move &move,
                             const Board &board) const {
+    if (!withinBoard(move.oldRow, move.oldCol) ||
+        !withinBoard(move.newRow, move.newCol)) {
+        return false;
+    }
+
     std::shared_ptr<Piece> piece = board.getPieceAt(move.oldRow, move.oldCol);
 
-    if (!withinBoard(move.newRow, move.newCol) || !piece->isMoveValid(move) ||
+    if (piece == nullptr || !piece->isMoveValid(move) ||
         piece->getColor() != turn) {
         return false;
     }
@@ -58,7 +65,7 @@ bool ChessGame::isValidMove(PieceColor turn, const Move &move,
         board.getPieceAt(move.newRow, move.newCol);
 
     // can't capture a piece of player's own color; also checks for self moves
-    if (piece->getColor() == nextPiece->getColor()) {
+    if (nextPiece != nullptr && piece->getColor() == nextPiece->getColor()) {
         return false;
     }
 
@@ -71,22 +78,26 @@ bool ChessGame::isValidMove(PieceColor turn, const Move &move,
         std::dynamic_pointer_cast<Queen>(piece) ||
         std::dynamic_pointer_cast<Rook>(piece) ||
         std::dynamic_pointer_cast<Pawn>(piece)) {
-        for (int i = move.oldRow; i != move.newRow;
-             i += (move.newRow - move.oldRow) / dy) {
-            for (int j = move.oldCol; j != move.newCol;
-                 j += (move.newCol - move.oldCol) / dx) {
-                // none of the positions between source and destination can be
-                // occupied
-                if (i != move.newRow && j != move.newCol &&
-                    board.getPieceAt(i, j) != nullptr) {
-                    return false;
-                }
+        int i = move.oldRow;
+        int j = move.oldCol;
 
-                // pawn can't move forward into another piece
-                if (std::dynamic_pointer_cast<Pawn>(piece) && dx == 0) {
-                    return false;
-                }
+        while(i != move.newRow || j != move.newCol) {
+            if(i == move.oldRow && j == move.oldCol) {
+                i += dy == 0 ? 0 : (move.newRow - move.oldRow) / dy;
+                j += dx == 0 ? 0 : (move.newCol - move.oldCol) / dx;
+                continue;
             }
+
+            if (board.getPieceAt(i, j) != nullptr) {
+                return false;
+            }
+
+            i += dy == 0 ? 0 : (move.newRow - move.oldRow) / dy;
+            j += dx == 0 ? 0 : (move.newCol - move.oldCol) / dx;
+        }
+
+        if(std::dynamic_pointer_cast<Pawn>(piece) && dx == 0 && board.getPieceAt(move.newRow, move.newCol) != nullptr) {
+            return false;
         }
     }
 
@@ -156,7 +167,7 @@ ChessGame::generateLegalMovesInternal(PieceColor color,
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             for (int k = 0; k < 8; ++k) {
-                for (int l = 0; l < 8; l++) {
+                for (int l = 0; l < 8; ++l) {
                     Move move = Move{i, j, k, l, color};
                     if (isValidMove(color, move, board)) {
                         legalMoves.push_back(move);
@@ -165,6 +176,8 @@ ChessGame::generateLegalMovesInternal(PieceColor color,
             }
         }
     }
+
+    return legalMoves;
 }
 
 void ChessGame::startGame() {
@@ -181,13 +194,19 @@ bool ChessGame::move(const Move &move) {
         return false;
     }
 
+    // std::cout << "Validated move" << std::endl;
+
     Board preliminaryBoard = Board(*board);
     preliminaryBoard.move(move);
+
+    // std::cout << "Copied board" << std::endl;
 
     // check if move puts king in check
     if (isKingInCheck(turn, preliminaryBoard)) {
         return false;
     }
+
+    // std::cout << "Checked for check" << std::endl;
 
     // TODO: castling
     // TODO: en passant
@@ -229,9 +248,7 @@ void ChessGame::resign() {
     gameState = turn == White ? ResignedWhite : ResignedBlack;
 }
 
-GameState ChessGame::getState() const {
-    return gameState;
-}
+GameState ChessGame::getState() const { return gameState; }
 
 PieceColor ChessGame::getTurn() const { return turn; }
 
@@ -268,7 +285,7 @@ bool ChessGame::isCapture(const Move &move) const {
 bool ChessGame::isCheck(const Move &move) const {
     Board preliminaryBoard = Board(*board);
     preliminaryBoard.move(move);
-    
+
     return isKingInCheck(move.color == White ? Black : White, preliminaryBoard);
 }
 
@@ -276,9 +293,10 @@ bool ChessGame::isMoveSafe(const Move &move) const {
     Board testBoard = Board(*board);
     testBoard.move(move);
 
-    std::vector<Move> opponentMoves = generateLegalMovesInternal(move.color == White ? Black : White, testBoard);
-    for(const auto &m: opponentMoves) {
-        if(isCaptureInternal(m, testBoard)) {
+    std::vector<Move> opponentMoves = generateLegalMovesInternal(
+        move.color == White ? Black : White, testBoard);
+    for (const auto &m : opponentMoves) {
+        if (isCaptureInternal(m, testBoard)) {
             return false;
         }
     }
@@ -290,14 +308,8 @@ int ChessGame::evaluateBoard(PieceColor color) const {
     int materialScore = 0;
 
     // Define piece values
-    std::map<char, int> pieceValues = {
-        {'k', 10000},
-        {'q', 900},
-        {'r', 500},
-        {'b', 330},
-        {'n', 320},
-        {'p', 100}
-    };
+    std::map<char, int> pieceValues = {{'k', 10000}, {'q', 900}, {'r', 500},
+                                       {'b', 330},   {'n', 320}, {'p', 100}};
 
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {

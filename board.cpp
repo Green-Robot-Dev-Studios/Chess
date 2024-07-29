@@ -59,11 +59,11 @@ void Board::move(const Move &move) {
     // Get the piece at the source square
     std::shared_ptr<Piece> piece = board[move.oldRow][move.oldCol].getPiece();
 
-    // Move the piece to the destination square
-    board[move.newRow][move.newCol].setPiece(piece);
-
     // Update piece fields
     piece->move(move);
+
+    // Move the piece to the destination square
+    board[move.newRow][move.newCol].setPiece(piece);
 
     // Clear the source square
     board[move.oldRow][move.oldCol].removePiece();

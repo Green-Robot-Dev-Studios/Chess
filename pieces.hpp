@@ -2,6 +2,7 @@
 #define PIECES_H
 
 #include "move.hpp"
+#include <memory>
 #include <vector>
 
 class Piece {
@@ -26,43 +27,73 @@ public:
     int getCol();
     int getMoveCount();
     char getLetter();
+
+    virtual std::shared_ptr<Piece> clone() const = 0;
 };
 
 class Bishop : public Piece {
-    public:
-    Bishop(PieceColor color, int r, int c) : Piece(color, r, c) { letter = 'b'; }
+public:
+    Bishop(PieceColor color, int r, int c) : Piece(color, r, c) {
+        letter = 'b';
+    }
+    std::shared_ptr<Piece> clone() const override {
+        return std::make_shared<Bishop>(*this);
+    }
+
     bool isMoveValidInternal(const Move &move) override;
 };
 
 class Knight : public Piece {
-    public:
-    Knight(PieceColor color, int r, int c) : Piece(color, r, c) { letter = 'n'; }
+public:
+    Knight(PieceColor color, int r, int c) : Piece(color, r, c) {
+        letter = 'n';
+    }
+    std::shared_ptr<Piece> clone() const override {
+        return std::make_shared<Knight>(*this);
+    }
+
     static std::vector<int> dy;
     static std::vector<int> dx;
     bool isMoveValidInternal(const Move &move) override;
 };
 
 class Pawn : public Piece {
-    public:
+public:
     Pawn(PieceColor color, int r, int c) : Piece(color, r, c) { letter = 'p'; }
+    std::shared_ptr<Piece> clone() const override {
+        return std::make_shared<Pawn>(*this);
+    }
+
     bool isMoveValidInternal(const Move &move) override;
 };
 
 class King : public Piece {
-    public:
+public:
     King(PieceColor color, int r, int c) : Piece(color, r, c) { letter = 'k'; }
+    std::shared_ptr<Piece> clone() const override {
+        return std::make_shared<King>(*this);
+    }
+
     bool isMoveValidInternal(const Move &move) override;
 };
 
 class Queen : public Piece {
-    public:
+public:
     Queen(PieceColor color, int r, int c) : Piece(color, r, c) { letter = 'q'; }
+    std::shared_ptr<Piece> clone() const override {
+        return std::make_shared<Queen>(*this);
+    }
+
     bool isMoveValidInternal(const Move &move) override;
 };
 
 class Rook : public Piece {
-    public:
+public:
     Rook(PieceColor color, int r, int c) : Piece(color, r, c) { letter = 'r'; }
+    std::shared_ptr<Piece> clone() const override {
+        return std::make_shared<Rook>(*this);
+    }
+
     bool isMoveValidInternal(const Move &move) override;
 };
 
