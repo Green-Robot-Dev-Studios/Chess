@@ -51,15 +51,14 @@ GraphicalView::GraphicalView(std::shared_ptr<Board> board) : ViewChild(board) {
     piecePixmaps['B'] = XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, black, white, depth);
     piecePixmaps['N'] = XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, black, white, depth);
     piecePixmaps['P'] = XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, black, white, depth);
-    piecePixmaps['k'] = XCreatePixmapFromBitmapData(d, w, (char*)king1, size, size, white, black, depth);
-    piecePixmaps['q'] = XCreatePixmapFromBitmapData(d, w, (char*)queen1, size, size, white, black, depth);
-    piecePixmaps['r'] = XCreatePixmapFromBitmapData(d, w, (char*)rook1, size, size, white, black, depth);
-    piecePixmaps['b'] = XCreatePixmapFromBitmapData(d, w, (char*)bishop1, size, size, white, black, depth);
-    piecePixmaps['n'] = XCreatePixmapFromBitmapData(d, w, (char*)knight1, size, size, white, black, depth);
-    piecePixmaps['p'] = XCreatePixmapFromBitmapData(d, w, (char*)pawn1, size, size, white, black, depth);
+    piecePixmaps['k'] = XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, white, black, depth);
+    piecePixmaps['q'] = XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, white, black, depth);
+    piecePixmaps['r'] = XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, white, black, depth);
+    piecePixmaps['b'] = XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, white, black, depth);
+    piecePixmaps['n'] = XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, white, black, depth);
+    piecePixmaps['p'] = XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, white, black, depth);
     XFlush(d);
     sleep(1);
-
 };
 
 void GraphicalView::notify() { draw(); }
@@ -85,10 +84,10 @@ void GraphicalView::draw() {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if (i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0) {
-                drawRect(i * 64, j * 64, 64, 64, colors[2]);
+                drawRect(i * 64, j * 64, 64, 64, colors[3]);
             }
             else {
-                drawRect(i * 64, j * 64, 64, 64, colors[3]);
+                drawRect(i * 64, j * 64, 64, 64, colors[2]);
             }
             if (!board->getPieceAt(j, i)) continue;
             drawString(i * 64, j * 64, board->getPieceAt(j, i)->getLetter());

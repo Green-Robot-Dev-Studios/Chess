@@ -7,11 +7,12 @@
 const int MAX_DEPTH = 3;
 
 class Player {
-protected:
+// protected:
+public:
     PieceColor color;
     int score;
     ChessGame* game;
-public:
+// public:
     Player(PieceColor color, ChessGame* game) : color(color), score(0), game(game) {}
     virtual Move getMove() = 0;
 };
