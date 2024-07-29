@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "graphical_view.hpp"
 #include "text_view.hpp"
 #include "players.hpp"
 #include <iostream>
@@ -17,6 +18,7 @@ int main() {
     game.startGame();
 
     TextView view = TextView(board);
+    GraphicalView graphical_view = GraphicalView(board);
     board->notifyObservers();
 
     // TODO: graceful exit on ctrl + D
