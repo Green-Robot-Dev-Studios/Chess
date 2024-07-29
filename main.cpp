@@ -17,8 +17,12 @@ int main() {
 
     game.startGame();
 
-    TextView view = TextView(board);
-    GraphicalView graphical_view = GraphicalView(board);
+    std::shared_ptr<TextView> textView = std::make_shared<TextView>(board);
+    board->attach(textView);
+
+    std::shared_ptr<GraphicalView> graphicalView = std::make_shared<GraphicalView>(board);
+    board->attach(graphicalView);
+    
     board->notifyObservers();
 
     // TODO: graceful exit on ctrl + D

@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <X11/Xlib.h>
-#include <map>
+#include <unordered_map>
 
 class GraphicalView : public ViewChild {
     Display *d;

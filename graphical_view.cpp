@@ -7,8 +7,6 @@
 #include <map>
 
 GraphicalView::GraphicalView(std::shared_ptr<Board> board) : ViewChild(board) {
-    board->attach(std::shared_ptr<Observer>(this));
-
     constexpr int WIDTH = 64*8;
     constexpr int HEIGHT = 64*8;
 

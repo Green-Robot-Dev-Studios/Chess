@@ -2,12 +2,14 @@
 
 void Subject::notifyObservers() {
     for(auto p: observers) {
-        p->notify();
+        if(auto observer = p.lock()) {
+            observer->notify();
+        }
     }
 }
 
 void Subject::attach(std::shared_ptr<Observer> o) {
-    observers.push_back(o);
+    observers.emplace_back(o);
 }
 
 Subject::~Subject() {}
