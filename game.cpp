@@ -7,6 +7,13 @@
 #include <memory>
 #include <utility>
 
+ChessGame::ChessGame() {}
+
+// TODO: potential error with player copying
+ChessGame::ChessGame(const ChessGame& other)
+    : board(std::make_shared<Board>(*other.board)), whitePlayer(other.whitePlayer), 
+    blackPlayer(other.blackPlayer), turn(other.turn), gameState(other.gameState), moveList(other.moveList) {}
+
 bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
 }

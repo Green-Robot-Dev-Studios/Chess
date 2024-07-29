@@ -42,11 +42,12 @@ class ChessGame {
     std::vector<Move> generateLegalMovesInternal(PieceColor color, const Board &board) const;
 
 public:
+    ChessGame();
     ChessGame(std::shared_ptr<Board> board) : board(board) {};
     ChessGame(std::shared_ptr<Board> board, std::shared_ptr<Player> whitePlayer,
               std::shared_ptr<Player> blackPlayer)
         : board(board), whitePlayer(whitePlayer), blackPlayer(blackPlayer) {};
-
+    ChessGame(const ChessGame &game);
     void startGame();
     void changeTurn();
     void resign();

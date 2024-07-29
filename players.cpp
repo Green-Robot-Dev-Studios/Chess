@@ -89,7 +89,7 @@ int Level4::minimax(ChessGame& game, int depth, int alpha, int beta, bool maximi
     if (depth == 0 || game.getState() != Ongoing) {
         return game.evaluateBoard(color);
     }
-    // TODO: FIXME
+
     auto legalMoves = game.generateLegalMoves();
     if (maximizingPlayer) {
         int maxEval = -1000000;
