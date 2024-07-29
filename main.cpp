@@ -12,7 +12,7 @@ int main() {
     ChessGame game{board}; 
 
     std::shared_ptr<Player> playerWhite = std::make_shared<Human>(PieceColor::White, &game); 
-    std::shared_ptr<Player> playerBlack = std::make_shared<Human>(PieceColor::Black, &game); 
+    std::shared_ptr<Player> playerBlack = std::make_shared<Level1>(PieceColor::Black, &game); 
     game.setPlayers(playerWhite, playerBlack); 
 
     game.startGame();
@@ -21,11 +21,22 @@ int main() {
     GraphicalView graphical_view = GraphicalView(board);
     board->notifyObservers();
 
-    // TODO: graceful exit on ctrl + D
-    // TODO: create piece shared ptr on pawn promotion move
+    std::string command;
+    while (std::cin >> command) {
+        if (command == "game") {
+            break;
+        } else if (command == "text") {
 
-    while (game.getState() == Ongoing || game.getState() == CheckForBlack || game.getState() == CheckForWhite) {
-        if (game.getState() == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {
+        } else if (command == "graphical") {
+
+        } else {
+            std::cout << "Invalid command." << std::endl;
+        }
+    }
+
+    GameState state = game.getState();
+    while (state == Ongoing || state == CheckForBlack || state == CheckForWhite) {
+        if (state == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {
             if(game.getTurn() == White) {
                 std::cout << "White is in check." << std::endl;
             } else {
@@ -38,20 +49,26 @@ int main() {
 
         Move move = currentPlayer->getMove();
         move.color = currentColor;
+        
+        std::cout<<"HI"<<std::endl;
+        std::cout<<"current color: "<<currentColor<<std::endl;
+        std::cout<<"current player: "<<currentPlayer->color<<std::endl;
 
         if (game.move(move)) {
-            std::cout << "Moved!" << std::endl;
+            std::cout << "Moveda!" << std::endl;
             game.changeTurn();
         } else {
             std::cout << "Invalid move!" << std::endl;
         }
+
+        state = game.getState();
     }
 
-    if (game.getState() == CheckmateForWhite) std::cout << "Checkmate! White wins!" << std::endl;
-    if (game.getState() == CheckmateForBlack) std::cout << "Checkmate! Black wins!" << std::endl;
-    if (game.getState() == ResignedWhite) std::cout << "Black wins!" << std::endl;
-    if (game.getState() == ResignedBlack) std::cout << "White wins!" << std::endl;
-    if (game.getState() == Stalemate) std::cout << "Stalemate!" << std::endl;
+    if (state == CheckmateForWhite) std::cout << "Checkmate! White wins!" << std::endl;
+    if (state == CheckmateForBlack) std::cout << "Checkmate! Black wins!" << std::endl;
+    if (state == ResignedWhite) std::cout << "Black wins!" << std::endl;
+    if (state == ResignedBlack) std::cout << "White wins!" << std::endl;
+    if (state == Stalemate) std::cout << "Stalemate!" << std::endl;
 
     return 0;
 }
