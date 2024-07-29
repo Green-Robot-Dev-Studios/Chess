@@ -30,9 +30,6 @@ class ChessGame {
 
     std::vector<Move> moveList = {};
 
-    void computeState();
-    std::pair<int, int> findKing(PieceColor color, const Board &board) const;
-
     bool isKingInCheck(PieceColor kingColor, const Board &board) const;
     bool isValidMove(PieceColor turn, const Move &move, const Board &board) const;
 
@@ -52,6 +49,9 @@ public:
     void changeTurn();
     void resign();
 
+    void computeState();
+    std::pair<int, int> findKing(PieceColor color, const Board &board) const;
+
     bool move(const Move &move);
     bool movePromotion(const Move &move, std::shared_ptr<Piece> promotedPiece);
 
@@ -61,6 +61,7 @@ public:
 
     void setPlayers(std::shared_ptr<Player> white,
                     std::shared_ptr<Player> black);
+    void setTurn(PieceColor turn);
 
     bool isCapture(const Move &move) const;
     bool isCheck(const Move &move) const;

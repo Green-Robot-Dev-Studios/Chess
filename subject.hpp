@@ -6,7 +6,8 @@
 #include <vector>
 
 class Subject {
-    std::vector<std::weak_ptr<Observer>> observers;
+protected:
+    std::vector<std::shared_ptr<Observer>> observers;
 public:
     void notifyObservers();
     void attach(std::shared_ptr<Observer> o);

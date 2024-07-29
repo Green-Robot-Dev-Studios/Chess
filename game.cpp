@@ -199,7 +199,6 @@ void ChessGame::startGame() {
     gameState = Ongoing;
     moveList.clear();
     turn = White;
-    board->resetBoard();
 }
 
 void ChessGame::changeTurn() { turn = turn == White ? Black : White; }
@@ -367,6 +366,8 @@ void ChessGame::setPlayers(std::shared_ptr<Player> white,
     this->whitePlayer = white;
     this->blackPlayer = black;
 }
+
+void ChessGame::setTurn(PieceColor turn) { this->turn = turn; }
 
 bool ChessGame::isCapture(const Move &move) const {
     return isCaptureInternal(move, *board);

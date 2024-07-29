@@ -1,28 +1,26 @@
 #include "board.hpp"
 #include <iostream>
 
-void Board::resetBoard() {
-    // Define board dimensions
-    const int boardSize = 8;
+static constexpr int boardSize = 8;
 
-    board.clear();
+Board::Board() : Subject() {}
 
-    // Initialize squares
-    for (int r = 0; r < boardSize; ++r) {
-        board.push_back({});
-        for (int c = 0; c < boardSize; ++c) {
-            board[r].push_back(
-                Square(r, c)); // Create Square at position (r, c)
-        }
-    }
+Board::Board(const Board &other): Subject(other), board(other.board) {
+    clearObservers();
+}
 
+void Board::clearObservers() {
+    observers.clear();
+}
+
+void Board::placeDefault() {
     // Place Pawns
     for (int c = 0; c < boardSize; ++c) {
         board[1][c].setPiece(
             std::make_shared<Pawn>(Black, 1, c)); // Black pawns on the 2nd row
         board[6][c].setPiece(
             std::make_shared<Pawn>(White, 6, c)); // White pawns on the 7th row
-    }
+    } 
 
     // Place Rooks
     board[0][0].setPiece(std::make_shared<Rook>(Black, 0, 0)); // Black Rooks
@@ -53,6 +51,20 @@ void Board::resetBoard() {
     // Place Kings
     board[0][4].setPiece(std::make_shared<King>(Black, 0, 4)); // Black King
     board[7][4].setPiece(std::make_shared<King>(White, 7, 4)); // White King
+}
+
+void Board::resetBoard() {
+    // Define board dimensions
+    board.clear();
+
+    // Initialize squares
+    for (int r = 0; r < boardSize; ++r) {
+        board.push_back({});
+        for (int c = 0; c < boardSize; ++c) {
+            board[r].push_back(
+                Square(r, c)); // Create Square at position (r, c)
+        }
+    }
 }
 
 void Board::move(const Move &move) {

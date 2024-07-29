@@ -7,25 +7,25 @@
 const int MAX_DEPTH = 3;
 
 class Player {
-// protected:
-public:
+protected:
     PieceColor color;
     int score;
     ChessGame* game;
-// public:
-    Player(PieceColor color, ChessGame* game) : color(color), score(0), game(game) {}
+public:
+    bool isHuman;
+    Player(PieceColor color, ChessGame* game, bool isHuman) : color(color), score(0), game(game), isHuman(isHuman) {}
     virtual Move getMove() = 0;
 };
 
 class Human : public Player {
 public:
-    Human(PieceColor color, ChessGame* game) : Player(color, game) {}
+    Human(PieceColor color, ChessGame* game) : Player(color, game, true) {}
     Move getMove() override;
 };
 
 class Computer : public Player {
 public:
-    Computer(PieceColor color, ChessGame* game) : Player(color, game) {}
+    Computer(PieceColor color, ChessGame* game) : Player(color, game, false) {}
 };
 
 class Level1 : public Computer {

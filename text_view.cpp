@@ -2,7 +2,7 @@
 #include <cstdio>
 
 void TextView::draw() {
-    printf("=============== Printing Chess Board ===============\n");
+    printf("\n=============== Printing Chess Board ===============\n");
     auto currentState = board->getState();
     int row = 8;
     for (auto i : currentState) {
