@@ -194,26 +194,19 @@ bool ChessGame::move(const Move &move) {
         return false;
     }
 
-    // std::cout << "Validated move" << std::endl;
-
     Board preliminaryBoard = Board(*board);
     preliminaryBoard.move(move);
-
-    // std::cout << "Copied board" << std::endl;
 
     // check if move puts king in check
     if (isKingInCheck(turn, preliminaryBoard)) {
         return false;
     }
 
-    // std::cout << "Checked for check" << std::endl;
-
     // TODO: castling
     // TODO: en passant
     // TODO: pawn promotion
 
     // compute game state
-
     // check if move puts opponents king in check
     if (isKingInCheck(turn == White ? Black : White, preliminaryBoard)) {
         gameState = turn == White ? CheckForWhite : CheckForBlack;
@@ -241,6 +234,12 @@ bool ChessGame::move(const Move &move) {
     }
 
     board->move(move);
+    
+    // reset game state to ongoing if escaped check
+    if(gameState == (turn == White ? CheckForBlack : CheckForWhite)) {
+        gameState = Ongoing;
+    }
+
     return true;
 }
 

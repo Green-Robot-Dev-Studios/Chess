@@ -1,0 +1,12 @@
+checklist:
+- for each piece type
+    a. valid move on piece itself
+    b. game logic valid move
+
+- can't make a move that puts your king in check
+
+- once in check, go through possible moves
+    a. capturing attacking piece
+    b. moving other piece in the way
+    c. moving the king
+

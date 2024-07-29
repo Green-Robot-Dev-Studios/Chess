@@ -9,7 +9,6 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/chess",
-            // "args": ["<", "${workspaceFolder}/a3/q2/tests/public0.in"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

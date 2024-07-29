@@ -111,7 +111,7 @@ bool King::isMoveValidInternal(const Move &move) {
     return (dx == 2 && dy == 0) || (dx <= 1 && dy <= 1);
 }
 
-// Queen should EITHER move same magnitude in both axes, or only moved in one axis
+// Queen should EITHER move same magnitude in both axes, or only move in one axis
 bool Queen::isMoveValidInternal(const Move &move) {
     int dx = abs(move.newCol - move.oldCol);
     int dy = abs(move.newRow - move.oldRow);

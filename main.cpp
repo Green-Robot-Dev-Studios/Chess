@@ -19,11 +19,9 @@ int main() {
     TextView view = TextView(board);
     board->notifyObservers();
 
-    GameState state = game.getState();
-
-    while (state == Ongoing || state == CheckForBlack || state == CheckForWhite) {
-        if (state == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {
-            std::cout << "Warning, you are in check!";
+    while (game.getState() == Ongoing || game.getState() == CheckForBlack || game.getState() == CheckForWhite) {
+        if (game.getState() == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {
+            std::cout << "Warning, you are in check!" << std::endl;
         }
 
         PieceColor currentColor = game.getTurn();
