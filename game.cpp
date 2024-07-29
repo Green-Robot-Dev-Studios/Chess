@@ -204,7 +204,7 @@ void ChessGame::startGame() {
 
 void ChessGame::changeTurn() { turn = turn == White ? Black : White; }
 
-bool ChessGame::move(const Move &move) {
+bool ChessGame::moveInternal(const Move &move) {
     if (!isValidMove(turn, move, *board)) {
         return false;
     }
@@ -318,9 +318,20 @@ bool ChessGame::move(const Move &move) {
         gameState = Ongoing;
     }
 
-    // TODO: pawn promotion
-
     return true;
+}
+
+bool ChessGame::move(const Move &move) {
+    return moveInternal(move);
+}
+
+bool ChessGame::movePromotion(const Move &move, std::shared_ptr<Piece> promotedPiece) {
+    if(moveInternal(move)) {
+        board->promotionMove(move, promotedPiece);
+        return true;
+    }
+
+    return false;
 }
 
 void ChessGame::resign() {

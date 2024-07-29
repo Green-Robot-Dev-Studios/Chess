@@ -14,6 +14,7 @@ public:
     void resetBoard();
     void move(const Move &move);
     void enPassantMove(const Move &move);
+    void promotionMove(const Move &move, std::shared_ptr<Piece> promotedPiece);
     std::shared_ptr<Piece> getPieceAt(int, int) const;
     std::vector<std::vector<Square>> getState() const;
 };

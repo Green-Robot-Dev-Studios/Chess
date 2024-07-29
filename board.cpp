@@ -91,6 +91,16 @@ void Board::enPassantMove(const Move &move) {
     notifyObservers();
 }
 
+void Board::promotionMove(const Move &move, std::shared_ptr<Piece> promotedPiece) {
+    // Clear the source square
+    board[move.oldRow][move.oldCol].removePiece();
+
+    // Set promoted piece
+    board[move.newRow][move.newCol].setPiece(promotedPiece);
+
+    notifyObservers();    
+}
+
 std::shared_ptr<Piece> Board::getPieceAt(int row, int col) const {
     return board[row][col].getPiece();
 }

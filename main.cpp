@@ -22,6 +22,7 @@ int main() {
     board->notifyObservers();
 
     // TODO: graceful exit on ctrl + D
+    // TODO: create piece shared ptr on pawn promotion move
 
     while (game.getState() == Ongoing || game.getState() == CheckForBlack || game.getState() == CheckForWhite) {
         if (game.getState() == (game.getTurn() == White ? CheckForBlack : CheckForWhite)) {

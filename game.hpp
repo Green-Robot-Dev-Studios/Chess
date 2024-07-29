@@ -39,6 +39,7 @@ class ChessGame {
     bool isCaptureInternal(const Move &move, const Board &board) const;
     bool isCheckInternal(const Move &move, std::pair<int, int> king) const;
 
+    bool moveInternal(const Move &move);
     std::vector<Move> generateLegalMovesInternal(PieceColor color, const Board &board) const;
 
 public:
@@ -49,8 +50,10 @@ public:
 
     void startGame();
     void changeTurn();
-    bool move(const Move &move);
     void resign();
+
+    bool move(const Move &move);
+    bool movePromotion(const Move &move, std::shared_ptr<Piece> promotedPiece);
 
     GameState getState() const;
     PieceColor getTurn() const;
