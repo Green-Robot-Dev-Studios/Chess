@@ -5,6 +5,7 @@
 #include <memory>
 #include <unistd.h>
 #include <map>
+#include <cstring>
 
 GraphicalView::GraphicalView(std::shared_ptr<Board> board) : ViewChild(board) {
     constexpr int WIDTH = 64*8;
