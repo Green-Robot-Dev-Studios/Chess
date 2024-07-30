@@ -31,7 +31,15 @@ int main() {
     srand(time(0));
 
     while (std::cout << "\n> " && std::cin >> command) {
-        if (command == "game") {
+        if (command == "help") {
+            std::cout << "Commands: \n"
+                      << "game <player1> <player2> - start a game between two players\n"
+                      << "setup - enter setup mode\n"
+                      << "quit - quit the game\n"
+                      << "Ctrl + D to quit anytime and get score\n";
+        } else if (command == "quit") {
+            break;
+        } else if (command == "game") {
             board->notifyObservers();
 
             std::string player1, player2;
@@ -124,13 +132,17 @@ int main() {
 
                             std::shared_ptr<Piece> p;
                             if (piece == "Q") p = std::make_shared<Queen>(White, move.newRow, move.newCol);
-                            if (piece == "q") p = std::make_shared<Queen>(Black, move.newRow, move.newCol);
-                            if (piece == "R") p = std::make_shared<Rook>(White, move.newRow, move.newCol);
-                            if (piece == "r") p = std::make_shared<Rook>(Black, move.newRow, move.newCol);
-                            if (piece == "N") p = std::make_shared<Knight>(White, move.newRow, move.newCol);
-                            if (piece == "n") p = std::make_shared<Knight>(Black, move.newRow, move.newCol);
-                            if (piece == "B") p = std::make_shared<Bishop>(White, move.newRow, move.newCol);
-                            if (piece == "b") p = std::make_shared<Bishop>(Black, move.newRow, move.newCol);
+                            else if (piece == "q") p = std::make_shared<Queen>(Black, move.newRow, move.newCol);
+                            else if (piece == "R") p = std::make_shared<Rook>(White, move.newRow, move.newCol);
+                            else if (piece == "r") p = std::make_shared<Rook>(Black, move.newRow, move.newCol);
+                            else if (piece == "N") p = std::make_shared<Knight>(White, move.newRow, move.newCol);
+                            else if (piece == "n") p = std::make_shared<Knight>(Black, move.newRow, move.newCol);
+                            else if (piece == "B") p = std::make_shared<Bishop>(White, move.newRow, move.newCol);
+                            else if (piece == "b") p = std::make_shared<Bishop>(Black, move.newRow, move.newCol);
+                            else {
+                                std::cout << "Invalid piece." << std::endl;
+                                continue;
+                            }
 
                             if (game.movePromotion(move, p)) {
                                 std::cout << "Moved!" << std::endl;
@@ -158,6 +170,7 @@ int main() {
                 state = game.getState();
             }
 
+            state = game.getState();
             if (state == CheckmateForWhite) {
                 std::cout << "Checkmate! White wins!" << std::endl;
                 whiteCount++;
@@ -166,9 +179,17 @@ int main() {
                 std::cout << "Checkmate! Black wins!" << std::endl;
                 blackCount++;
             }
-            if (state == ResignedWhite) std::cout << "Black wins!" << std::endl;
-            if (state == ResignedBlack) std::cout << "White wins!" << std::endl;
-            if (state == Stalemate) std::cout << "Stalemate!" << std::endl;
+            if (state == ResignedWhite) {
+                std::cout << "Black wins!" << std::endl;
+                blackCount++;
+            }
+            if (state == ResignedBlack) {
+                std::cout << "White wins!" << std::endl;
+                whiteCount++;
+            }
+            if (state == Stalemate) {
+                std::cout << "Stalemate!" << std::endl;
+            }
 
             board->resetBoard();
             board->placeDefault();
@@ -190,17 +211,21 @@ int main() {
                     int col = spot[0] - 'a';
 
                     if (piece == "K") p = std::make_shared<King>(White, row, col);
-                    if (piece == "k") p = std::make_shared<King>(Black, row, col);
-                    if (piece == "Q") p = std::make_shared<Queen>(White, row, col);
-                    if (piece == "q") p = std::make_shared<Queen>(Black, row, col);
-                    if (piece == "R") p = std::make_shared<Rook>(White, row, col);
-                    if (piece == "r") p = std::make_shared<Rook>(Black, row, col);
-                    if (piece == "N") p = std::make_shared<Knight>(White, row, col);
-                    if (piece == "n") p = std::make_shared<Knight>(Black, row, col);
-                    if (piece == "B") p = std::make_shared<Bishop>(White, row, col);
-                    if (piece == "b") p = std::make_shared<Bishop>(Black, row, col);
-                    if (piece == "P") p = std::make_shared<Pawn>(White, row, col);
-                    if (piece == "p") p = std::make_shared<Pawn>(Black, row, col);
+                    else if (piece == "k") p = std::make_shared<King>(Black, row, col);
+                    else if (piece == "Q") p = std::make_shared<Queen>(White, row, col);
+                    else if (piece == "q") p = std::make_shared<Queen>(Black, row, col);
+                    else if (piece == "R") p = std::make_shared<Rook>(White, row, col);
+                    else if (piece == "r") p = std::make_shared<Rook>(Black, row, col);
+                    else if (piece == "N") p = std::make_shared<Knight>(White, row, col);
+                    else if (piece == "n") p = std::make_shared<Knight>(Black, row, col);
+                    else if (piece == "B") p = std::make_shared<Bishop>(White, row, col);
+                    else if (piece == "b") p = std::make_shared<Bishop>(Black, row, col);
+                    else if (piece == "P") p = std::make_shared<Pawn>(White, row, col);
+                    else if (piece == "p") p = std::make_shared<Pawn>(Black, row, col);
+                    else {
+                        std::cout << "Invalid piece." << std::endl;
+                        continue;
+                    }
 
                     if (game.findKing(White, *board).first != -1 && piece == "K") {
                         std::cout << "Invalid setup." << std::endl;
