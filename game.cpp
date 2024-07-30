@@ -19,7 +19,7 @@ bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
 }
 
-void ChessGame::computeStalemate(PieceColor turn) {
+void ChessGame::computeStalemate() {
     if (gameState != (turn == White ? CheckForBlack : CheckForWhite) &&
         gameState != (turn == White ? CheckmateForBlack : CheckmateForWhite) &&
         generateLegalMoves().size() == 0) {
@@ -212,7 +212,6 @@ ChessGame::generateLegalMovesInternal(PieceColor color,
 void ChessGame::startGame() {
     gameState = Ongoing;
     moveList.clear();
-    turn = White;
 }
 
 void ChessGame::changeTurn() { turn = turn == White ? Black : White; }
@@ -326,8 +325,6 @@ bool ChessGame::moveInternal(const Move &move) {
             gameState = turn == White ? CheckmateForWhite : CheckmateForBlack;
         }
     }
-
-    computeStalemate(turn == White ? Black : White);
 
     // reset game state to ongoing if escaped check
     if (gameState == (turn == White ? CheckForBlack : CheckForWhite)) {
@@ -443,18 +440,12 @@ bool ChessGame::isMoveSafe(const Move &move) const {
     std::vector<Move> opponentMoves = generateLegalMovesInternal(
         move.color == White ? Black : White, testBoard);
 
-    std::cout << "For move: " << move.oldRow << move.oldCol << move.newRow
-              << move.newCol << std::endl;
-
     for (const auto &m : opponentMoves) {
         if (isCaptureTargetInternal(m,
                                     std::make_pair(move.newRow, move.newCol))) {
-            std::cout << "captured by: " << m.oldRow << m.oldCol << std::endl;
             return false;
         }
     }
-
-    std::cout << "good" << std::endl;
 
     return true;
 }
@@ -480,8 +471,8 @@ bool ChessGame::isPromotion(const Move &move) const {
         return false;
     }
 
-    return std::dynamic_pointer_cast<Pawn>(piece) && move.newRow == 7 ||
-           move.newRow == 0;
+    return std::dynamic_pointer_cast<Pawn>(piece) && (move.newRow == 7 ||
+           move.newRow == 0);
 }
 
 bool ChessGame::kingIsInCheck(PieceColor kingColor) const {

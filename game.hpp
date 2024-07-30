@@ -26,7 +26,7 @@ class ChessGame {
     std::shared_ptr<Player> whitePlayer;
     std::shared_ptr<Player> blackPlayer;
 
-    PieceColor turn;
+    PieceColor turn = White;
     GameState gameState;
 
     std::vector<Move> moveList = {};
@@ -52,7 +52,7 @@ public:
     void changeTurn();
     void resign();
 
-    void computeStalemate(PieceColor turn);
+    void computeStalemate();
     std::pair<int, int> findKing(PieceColor color, const Board &board) const;
 
     bool move(const Move &move);
