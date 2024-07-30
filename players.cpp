@@ -7,15 +7,14 @@
 using namespace std;
 
 Move Human::getMove() {
-    std::string answer;
-    std::cout << "Where would you like to move: ";
-    std::cin >> answer;
+    std::string old, next;
+    std::cin >> old >> next;
 
-    // <oldcolumn><oldRow><newColumn><newRow>
-    int oldColumn = answer[0] - 'a';
-    int oldRow = 8 - (answer[1] - '0');
-    int newColumn = answer[2] - 'a';
-    int newRow = 8 - (answer[3] - '0');
+    // <oldcolumn><oldRow> <newColumn><newRow>
+    int oldColumn = old[0] - 'a';
+    int oldRow = 8 - (old[1] - '0');
+    int newColumn = next[0] - 'a';
+    int newRow = 8 - (next[1] - '0');
     
     return Move{oldRow, oldColumn, newRow, newColumn};
 }

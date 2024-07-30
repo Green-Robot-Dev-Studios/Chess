@@ -10,9 +10,10 @@
 ChessGame::ChessGame() {}
 
 // TODO: potential error with player copying
-ChessGame::ChessGame(const ChessGame& other)
-    : board(std::make_shared<Board>(*other.board)), whitePlayer(other.whitePlayer), 
-    blackPlayer(other.blackPlayer), turn(other.turn), gameState(other.gameState), moveList(other.moveList) {}
+ChessGame::ChessGame(const ChessGame &other)
+    : board(std::make_shared<Board>(*other.board)),
+      whitePlayer(other.whitePlayer), blackPlayer(other.blackPlayer),
+      turn(other.turn), gameState(other.gameState), moveList(other.moveList) {}
 
 bool withinBoard(int row, int col) {
     return row >= 0 && col >= 0 && row < 8 && col < 8;
@@ -177,7 +178,8 @@ bool ChessGame::isCaptureInternal(const Move &move, const Board &board) const {
     return board.getPieceAt(move.newRow, move.newCol) != nullptr;
 }
 
-bool ChessGame::isCaptureTargetInternal(const Move &move, std::pair<int, int> target) const {
+bool ChessGame::isCaptureTargetInternal(const Move &move,
+                                        std::pair<int, int> target) const {
     return move.newRow == target.first && move.newCol == target.second;
 }
 
@@ -381,9 +383,8 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
                 continue;
             }
 
-            Move intermediate =
-                Move{m.oldRow, m.oldCol, m.newRow,
-                    m.oldCol + (m.newCol - m.oldCol) / dx};
+            Move intermediate = Move{m.oldRow, m.oldCol, m.newRow,
+                                     m.oldCol + (m.newCol - m.oldCol) / dx};
             preliminaryBoard.move(intermediate);
 
             // intermediate position
@@ -391,9 +392,9 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
                 continue;
             }
 
-            Move final =
-                Move{intermediate.newRow, intermediate.newCol, intermediate.newRow,
-                    intermediate.newCol + (m.newCol - m.oldCol) / dx};
+            Move final = Move{intermediate.newRow, intermediate.newCol,
+                              intermediate.newRow,
+                              intermediate.newCol + (m.newCol - m.oldCol) / dx};
             preliminaryBoard.move(final);
 
             // final position
@@ -442,10 +443,12 @@ bool ChessGame::isMoveSafe(const Move &move) const {
     std::vector<Move> opponentMoves = generateLegalMovesInternal(
         move.color == White ? Black : White, testBoard);
 
-    std::cout << "For move: " << move.oldRow << move.oldCol << move.newRow << move.newCol << std::endl;
+    std::cout << "For move: " << move.oldRow << move.oldCol << move.newRow
+              << move.newCol << std::endl;
 
     for (const auto &m : opponentMoves) {
-        if (isCaptureTargetInternal(m, std::make_pair(move.newRow, move.newCol))) {
+        if (isCaptureTargetInternal(m,
+                                    std::make_pair(move.newRow, move.newCol))) {
             std::cout << "captured by: " << m.oldRow << m.oldCol << std::endl;
             return false;
         }
@@ -454,6 +457,31 @@ bool ChessGame::isMoveSafe(const Move &move) const {
     std::cout << "good" << std::endl;
 
     return true;
+}
+
+bool ChessGame::isPromotion(const Move &move) const {
+    if (!withinBoard(move.oldRow, move.oldCol) ||
+        !withinBoard(move.newRow, move.newCol)) {
+        return false;
+    }
+
+    std::shared_ptr<Piece> piece = board->getPieceAt(move.oldRow, move.oldCol);
+
+    if (piece == nullptr || !piece->isMoveValid(move) ||
+        piece->getColor() != turn) {
+        return false;
+    }
+
+    std::shared_ptr<Piece> nextPiece =
+        board->getPieceAt(move.newRow, move.newCol);
+
+    // can't capture a piece of player's own color; also checks for self moves
+    if (nextPiece != nullptr && piece->getColor() == nextPiece->getColor()) {
+        return false;
+    }
+
+    return std::dynamic_pointer_cast<Pawn>(piece) && move.newRow == 7 ||
+           move.newRow == 0;
 }
 
 int ChessGame::evaluateBoard(PieceColor color) const {

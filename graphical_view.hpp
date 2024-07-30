@@ -22,6 +22,7 @@ class GraphicalView : public ViewChild {
 
     void drawRect(int x, int y, int width, int height, unsigned long color);
     void drawString(int, int, char);
+    void drawPiece(int, int, char);
 public:
     GraphicalView(std::shared_ptr<Board> board);
 };

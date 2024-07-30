@@ -71,10 +71,16 @@ void GraphicalView::drawRect(int x, int y, int width, int height, unsigned long 
     XFlush(d);
 }
 
-void GraphicalView::drawString(int x, int y, char letter) {
+void GraphicalView::drawPiece(int x, int y, char letter) {
     if (letter == ' ') return;
 
     XCopyArea(d, piecePixmaps[letter], w, gc, 0, 0, 48, 48, x + 8, y + 8);
+    XFlush(d);
+}
+
+void GraphicalView::drawString(int x, int y, char letter) {
+    char str[2] = {letter, '\0'};
+    XDrawString(d, w, gc, x, y, str, (int)strlen(str));
     XFlush(d);
 }
 
@@ -89,8 +95,15 @@ void GraphicalView::draw() {
             else {
                 drawRect(i * 64, j * 64, 64, 64, colors[2]);
             }
+
+            if (i == 0) {
+                drawString(0, j * 64 + 10, '8' - j);
+            }
+
             if (!board->getPieceAt(j, i)) continue;
-            drawString(i * 64, j * 64, board->getPieceAt(j, i)->getLetter());
+            drawPiece(i * 64, j * 64, board->getPieceAt(j, i)->getLetter());
         }
+
+        drawString(i * 64, 64*8, 'a' + i);
     }
 }

@@ -69,6 +69,7 @@ public:
     bool isCapture(const Move &move) const;
     bool isCheck(const Move &move) const;
     bool isMoveSafe(const Move &move) const;
+    bool isPromotion(const Move &move) const;
 
     int evaluateBoard(PieceColor color) const;
 };

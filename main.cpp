@@ -25,17 +25,14 @@ int main() {
     board->placeDefault();
     game.setTurn(White);
 
-    std::cout << "> ";
-
     int whiteCount = 0;
     int blackCount = 0;
 
     srand(time(0));
 
-    while (std::cin >> command) {
+    while (std::cout << "\n> " && std::cin >> command) {
         if (command == "game") {
             board->notifyObservers();
-
 
             std::string player1, player2;
             std::cin >> player1 >> player2;
@@ -44,31 +41,31 @@ int main() {
 
             if (player1 == "human") {
                 playerWhite = std::make_shared<Human>(PieceColor::White, &game);
-            } else if (player1 == "level1") {
+            } else if (player1 == "computer1") {
                 playerWhite = std::make_shared<Level1>(PieceColor::White, &game);
-            } else if (player1 == "level2") {
+            } else if (player1 == "computer2") {
                 playerWhite = std::make_shared<Level2>(PieceColor::White, &game);
-            } else if (player1 == "level3") {
+            } else if (player1 == "computer3") {
                 playerWhite = std::make_shared<Level3>(PieceColor::White, &game);
-            } else if (player1 == "level4") {
-                playerBlack = std::make_shared<Level4>(PieceColor::Black, &game);
+            } else if (player1 == "computer4") {
+                playerBlack = std::make_shared<Level4>(PieceColor::White, &game);
             } else {
-                std::cout << "Invalid player." << std::endl;
+                std::cout << "Invalid player for white." << std::endl;
                 continue;
             }
 
             if (player2 == "human") {
                 playerBlack = std::make_shared<Human>(PieceColor::Black, &game);
-            } else if (player2 == "level1") {
+            } else if (player2 == "computer1") {
                 playerBlack = std::make_shared<Level1>(PieceColor::Black, &game);
-            } else if (player2 == "level2") {
+            } else if (player2 == "computer2") {
                 playerBlack = std::make_shared<Level2>(PieceColor::Black, &game);
-            } else if (player2 == "level3") {
+            } else if (player2 == "computer3") {
                 playerBlack = std::make_shared<Level3>(PieceColor::Black, &game);
-            } else if (player2 == "level4") {
+            } else if (player2 == "computer4") {
                 playerBlack = std::make_shared<Level4>(PieceColor::Black, &game);
             } else {
-                std::cout << "Invalid player." << std::endl;
+                std::cout << "Invalid player for black." << std::endl;
                 continue;
             }
 
@@ -90,8 +87,17 @@ int main() {
                 std::shared_ptr<Player> &currentPlayer = currentColor == White ? playerWhite : playerBlack;
 
                 if (!currentPlayer->isHuman) {
+                    std::cout << "Computer to play. (type `move`) > ";
+
                     Move move = currentPlayer->getMove();
                     move.color = currentColor;
+
+                    std::string subcommand;
+                    std::cin >> subcommand;
+                    if (subcommand != "move") {
+                        std::cout << "Invalid command";
+                        continue;
+                    }
 
                     if (game.move(move)) {
                         std::cout << "Moved!" << std::endl;
@@ -101,6 +107,8 @@ int main() {
                         continue;
                     }
                 } else {
+                    std::cout << (currentColor == White ? "White" : "Black") << " to play. > ";
+
                     std::string subcommand;
                     std::cin >> subcommand;
                     if (subcommand == "resign") {
@@ -110,13 +118,37 @@ int main() {
                         Move move = currentPlayer->getMove();
                         move.color = currentColor;
                         
-                        if (game.move(move)) {
-                            std::cout << "Moved!" << std::endl;
-                            game.changeTurn();
+                        if (game.isPromotion(move)) {
+                            std::string piece;
+                            std::cin >> piece;
+
+                            std::shared_ptr<Piece> p;
+                            if (piece == "Q") p = std::make_shared<Queen>(White, move.newRow, move.newCol);
+                            if (piece == "q") p = std::make_shared<Queen>(Black, move.newRow, move.newCol);
+                            if (piece == "R") p = std::make_shared<Rook>(White, move.newRow, move.newCol);
+                            if (piece == "r") p = std::make_shared<Rook>(Black, move.newRow, move.newCol);
+                            if (piece == "N") p = std::make_shared<Knight>(White, move.newRow, move.newCol);
+                            if (piece == "n") p = std::make_shared<Knight>(Black, move.newRow, move.newCol);
+                            if (piece == "B") p = std::make_shared<Bishop>(White, move.newRow, move.newCol);
+                            if (piece == "b") p = std::make_shared<Bishop>(Black, move.newRow, move.newCol);
+
+                            if (game.movePromotion(move, p)) {
+                                std::cout << "Moved!" << std::endl;
+                                game.changeTurn();
+                            } else {
+                                std::cout << "Invalid move!" << std::endl;
+                                continue;
+                            }
                         } else {
-                            std::cout << "Invalid move!" << std::endl;
-                            continue;
+                            if (game.move(move)) {
+                                std::cout << "Moved!" << std::endl;
+                                game.changeTurn();
+                            } else {
+                                std::cout << "Invalid move!" << std::endl;
+                                continue;
+                            }
                         }
+
                     } else {
                         std::cout << "Invalid command." << std::endl;
                         continue;
@@ -149,9 +181,7 @@ int main() {
 
             // board->notifyObservers();
 
-            while (std::cin >> subcommand) {
-                std::cout << "\nsetup > ";
-
+            while (std::cout << "\nsetup > " && std::cin >> subcommand) {
                 if (subcommand == "+") {
                     std::string piece, spot;
                     std::cin >> piece >> spot;
@@ -215,7 +245,6 @@ int main() {
             std::cout << "Invalid command." << std::endl;
         }
 
-        std::cout << "\n> ";
     }
 
     std::cout << "Final Score: \n" << "White: " << whiteCount << "\nBlack: " << blackCount << std::endl;
