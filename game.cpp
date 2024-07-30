@@ -27,6 +27,33 @@ void ChessGame::computeStalemate() {
     }
 }
 
+void ChessGame::computeState(PieceColor color) {
+    if (isKingInCheckInternal(color, *board)) {
+        gameState = color == White ? CheckForBlack : CheckForWhite;
+
+        std::vector<Move> opponentMoves = generateLegalMovesInternal(
+            color, *board);
+
+        // if none of these moves result in being out of check ->
+        // checkmate
+        bool outOfCheck = false;
+        for (const auto &m : opponentMoves) {
+            Board preliminaryOpponentBoard = Board(*board);
+            preliminaryOpponentBoard.move(m);
+
+            if (!isKingInCheckInternal(color,
+                               preliminaryOpponentBoard)) {
+                outOfCheck = true;
+                break;
+            }
+        }
+
+        if (!outOfCheck) {
+            gameState = color == White ? CheckmateForBlack : CheckmateForWhite;
+        }
+    }
+}
+
 std::pair<int, int> ChessGame::findKing(PieceColor color,
                                         const Board &board) const {
     for (int i = 0; i < 8; ++i) {
@@ -298,34 +325,6 @@ bool ChessGame::moveInternal(const Move &move) {
         moveList.push_back(move);
     }
 
-    // compute game state
-
-    // check if move puts opponents king in check
-    if (isKingInCheckInternal(turn == White ? Black : White, preliminaryBoard)) {
-        gameState = turn == White ? CheckForWhite : CheckForBlack;
-
-        std::vector<Move> opponentMoves = generateLegalMovesInternal(
-            turn == White ? Black : White, preliminaryBoard);
-
-        // if none of these moves result in opponent being out of check ->
-        // checkmate
-        bool outOfCheck = false;
-        for (const auto &m : opponentMoves) {
-            Board preliminaryOpponentBoard = Board(preliminaryBoard);
-            preliminaryOpponentBoard.move(m);
-
-            if (!isKingInCheckInternal(turn == White ? Black : White,
-                               preliminaryOpponentBoard)) {
-                outOfCheck = true;
-                break;
-            }
-        }
-
-        if (!outOfCheck) {
-            gameState = turn == White ? CheckmateForWhite : CheckmateForBlack;
-        }
-    }
-
     // reset game state to ongoing if escaped check
     if (gameState == (turn == White ? CheckForBlack : CheckForWhite)) {
         gameState = Ongoing;
@@ -334,12 +333,20 @@ bool ChessGame::moveInternal(const Move &move) {
     return true;
 }
 
-bool ChessGame::move(const Move &move) { return moveInternal(move); }
+bool ChessGame::move(const Move &move) { 
+    if(moveInternal(move)) {
+        computeState(turn == White ? Black : White);
+        return true;
+    }
+
+    return false;
+}
 
 bool ChessGame::movePromotion(const Move &move,
                               std::shared_ptr<Piece> promotedPiece) {
     if (moveInternal(move)) {
         board->promotionMove(move, promotedPiece);
+        computeState(turn == White ? Black : White);
         return true;
     }
 

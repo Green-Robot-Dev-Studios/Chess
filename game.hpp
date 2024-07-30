@@ -31,6 +31,8 @@ class ChessGame {
 
     std::vector<Move> moveList = {};
 
+    void computeState(PieceColor color);
+
     bool isKingInCheckInternal(PieceColor kingColor, const Board &board) const;
     bool isValidMove(PieceColor turn, const Move &move, const Board &board) const;
 
