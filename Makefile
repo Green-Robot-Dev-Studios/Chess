@@ -1,2 +1,2 @@
 chess: *
-	g++ -std=c++17 -g -o chess *.cpp
+	g++ -std=c++17 -o chess *.cpp -lX11
