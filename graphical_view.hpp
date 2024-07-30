@@ -12,7 +12,7 @@ class GraphicalView : public ViewChild {
     Window w;
     int s;
     GC gc;
-    std::unordered_map<char, Pixmap> piecePixmaps;
+    std::unordered_map<char, std::pair<Pixmap, Pixmap>> piecePixmaps;
 
     unsigned long colors[10];
 
@@ -22,7 +22,7 @@ class GraphicalView : public ViewChild {
 
     void drawRect(int x, int y, int width, int height, unsigned long color);
     void drawString(int, int, char);
-    void drawPiece(int, int, char);
+    void drawPiece(int, int, char, bool);
 public:
     GraphicalView(std::shared_ptr<Board> board);
 };

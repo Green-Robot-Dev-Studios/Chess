@@ -31,7 +31,7 @@ class ChessGame {
 
     std::vector<Move> moveList = {};
 
-    bool isKingInCheck(PieceColor kingColor, const Board &board) const;
+    bool isKingInCheckInternal(PieceColor kingColor, const Board &board) const;
     bool isValidMove(PieceColor turn, const Move &move, const Board &board) const;
 
     bool isCaptureInternal(const Move &move, const Board &board) const;
@@ -70,6 +70,8 @@ public:
     bool isCheck(const Move &move) const;
     bool isMoveSafe(const Move &move) const;
     bool isPromotion(const Move &move) const;
+
+    bool kingIsInCheck(PieceColor kingColor) const;
 
     int evaluateBoard(PieceColor color) const;
 };

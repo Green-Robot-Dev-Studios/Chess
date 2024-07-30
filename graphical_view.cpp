@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <map>
 #include <cstring>
+#include <utility>
 
 GraphicalView::GraphicalView(std::shared_ptr<Board> board) : ViewChild(board) {
     constexpr int WIDTH = 64*8;
@@ -44,20 +45,66 @@ GraphicalView::GraphicalView(std::shared_ptr<Board> board) : ViewChild(board) {
 
     int size = 48;
     unsigned int depth = DefaultDepth(d, DefaultScreen(d));
-    unsigned long black = XBlackPixel(d, s);
-    unsigned long white = XWhitePixel(d, s);
-    piecePixmaps['K'] = XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, black, white, depth);
-    piecePixmaps['Q'] = XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, black, white, depth);
-    piecePixmaps['R'] = XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, black, white, depth);
-    piecePixmaps['B'] = XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, black, white, depth);
-    piecePixmaps['N'] = XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, black, white, depth);
-    piecePixmaps['P'] = XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, black, white, depth);
-    piecePixmaps['k'] = XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, white, black, depth);
-    piecePixmaps['q'] = XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, white, black, depth);
-    piecePixmaps['r'] = XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, white, black, depth);
-    piecePixmaps['b'] = XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, white, black, depth);
-    piecePixmaps['n'] = XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, white, black, depth);
-    piecePixmaps['p'] = XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, white, black, depth);
+    
+    XColor white, black;
+    white.pixel = 0xffffffff;
+    black.pixel = 0x00000000;
+
+    unsigned long yellow = colors[2];
+    unsigned long brown = colors[3];
+
+
+    piecePixmaps['K'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, yellow, white.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, brown, white.pixel, depth)
+    };
+    piecePixmaps['Q'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, yellow, white.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, brown, white.pixel, depth)
+    };
+    piecePixmaps['R'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, yellow, white.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, brown, white.pixel, depth)
+    };
+    piecePixmaps['N'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, yellow, white.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, brown, white.pixel, depth)
+    };
+    piecePixmaps['B'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, yellow, white.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, brown, white.pixel, depth)
+    };
+    piecePixmaps['P'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, yellow, white.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, brown, white.pixel, depth)
+    };
+    piecePixmaps['k'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, yellow, black.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)king, size, size, brown, black.pixel, depth)
+    };
+    piecePixmaps['q'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, yellow, black.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)queen, size, size, brown, black.pixel, depth)
+    };
+    piecePixmaps['r'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, yellow, black.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)rook, size, size, brown, black.pixel, depth)
+    };
+    piecePixmaps['n'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, yellow, black.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)knight, size, size, brown, black.pixel, depth)
+    };
+    piecePixmaps['b'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, yellow, black.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)bishop, size, size, brown, black.pixel, depth)
+    };
+    piecePixmaps['p'] = {
+        XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, yellow, black.pixel, depth),
+        XCreatePixmapFromBitmapData(d, w, (char*)pawn, size, size, brown, black.pixel, depth)
+    };
+
+
+
     XFlush(d);
     sleep(1);
 };
@@ -72,10 +119,10 @@ void GraphicalView::drawRect(int x, int y, int width, int height, unsigned long 
     XFlush(d);
 }
 
-void GraphicalView::drawPiece(int x, int y, char letter) {
+void GraphicalView::drawPiece(int x, int y, char letter, bool isYellow) {
     if (letter == ' ') return;
 
-    XCopyArea(d, piecePixmaps[letter], w, gc, 0, 0, 48, 48, x + 8, y + 8);
+    XCopyArea(d, isYellow ? piecePixmaps[letter].first : piecePixmaps[letter].second, w, gc, 0, 0, 48, 48, x + 8, y + 8);
     XFlush(d);
 }
 
@@ -90,11 +137,14 @@ void GraphicalView::draw() {
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
+            unsigned long color;
             if (i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0) {
-                drawRect(i * 64, j * 64, 64, 64, colors[3]);
+                color = colors[3];
+                drawRect(i * 64, j * 64, 64, 64, color);
             }
             else {
-                drawRect(i * 64, j * 64, 64, 64, colors[2]);
+                color = colors[2];
+                drawRect(i * 64, j * 64, 64, 64, color);
             }
 
             if (i == 0) {
@@ -102,7 +152,7 @@ void GraphicalView::draw() {
             }
 
             if (!board->getPieceAt(j, i)) continue;
-            drawPiece(i * 64, j * 64, board->getPieceAt(j, i)->getLetter());
+            drawPiece(i * 64, j * 64, board->getPieceAt(j, i)->getLetter(), color == colors[2]);
         }
 
         drawString(i * 64, 64*8, 'a' + i);

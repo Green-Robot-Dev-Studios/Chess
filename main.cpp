@@ -40,8 +40,6 @@ int main() {
         } else if (command == "quit") {
             break;
         } else if (command == "game") {
-            board->notifyObservers();
-
             std::string player1, player2;
             std::cin >> player1 >> player2;
 
@@ -76,6 +74,8 @@ int main() {
                 std::cout << "Invalid player for black." << std::endl;
                 continue;
             }
+
+            board->notifyObservers();
 
             game.setPlayers(playerWhite, playerBlack); 
 
@@ -258,6 +258,16 @@ int main() {
                     game.setTurn(color == "white" ? White : Black);
                     std::cout<<game.getTurn()<<std::endl;
                 } else if (subcommand == "done") {
+                    if (game.findKing(White, *board).first == -1 || game.findKing(Black, *board).first == -1) {
+                        std::cout << "Invalid setup. Missing a king." << std::endl;
+                        continue;
+                    }
+
+                    if (game.kingIsInCheck(White) || game.kingIsInCheck(Black)) {
+                        std::cout << "Invalid setup. King is in check." << std::endl;
+                        continue;
+                    }
+
                     break;
                 } else {
                     std::cout << "Invalid command." << std::endl;

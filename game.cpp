@@ -42,7 +42,7 @@ std::pair<int, int> ChessGame::findKing(PieceColor color,
     return std::make_pair(-1, -1);
 }
 
-bool ChessGame::isKingInCheck(PieceColor kingColor, const Board &board) const {
+bool ChessGame::isKingInCheckInternal(PieceColor kingColor, const Board &board) const {
     std::vector<Move> opponentMoves =
         generateLegalMovesInternal(kingColor == White ? Black : White, board);
 
@@ -237,7 +237,7 @@ bool ChessGame::moveInternal(const Move &move) {
         nextPiece == nullptr) {
         preliminaryBoard.move(move);
 
-        if (isKingInCheck(turn, preliminaryBoard)) {
+        if (isKingInCheckInternal(turn, preliminaryBoard)) {
             return false;
         }
 
@@ -248,7 +248,7 @@ bool ChessGame::moveInternal(const Move &move) {
         // castling
     } else if (std::dynamic_pointer_cast<King>(piece) && dx == 2) {
         // initial position
-        if (isKingInCheck(turn, preliminaryBoard)) {
+        if (isKingInCheckInternal(turn, preliminaryBoard)) {
             return false;
         }
 
@@ -258,7 +258,7 @@ bool ChessGame::moveInternal(const Move &move) {
         preliminaryBoard.move(intermediate);
 
         // intermediate position
-        if (isKingInCheck(turn, preliminaryBoard)) {
+        if (isKingInCheckInternal(turn, preliminaryBoard)) {
             return false;
         }
 
@@ -268,7 +268,7 @@ bool ChessGame::moveInternal(const Move &move) {
         preliminaryBoard.move(final);
 
         // final position
-        if (isKingInCheck(turn, preliminaryBoard)) {
+        if (isKingInCheckInternal(turn, preliminaryBoard)) {
             return false;
         }
 
@@ -290,7 +290,7 @@ bool ChessGame::moveInternal(const Move &move) {
         preliminaryBoard.move(move);
 
         // check if move puts king in check
-        if (isKingInCheck(turn, preliminaryBoard)) {
+        if (isKingInCheckInternal(turn, preliminaryBoard)) {
             return false;
         }
 
@@ -302,7 +302,7 @@ bool ChessGame::moveInternal(const Move &move) {
     // compute game state
 
     // check if move puts opponents king in check
-    if (isKingInCheck(turn == White ? Black : White, preliminaryBoard)) {
+    if (isKingInCheckInternal(turn == White ? Black : White, preliminaryBoard)) {
         gameState = turn == White ? CheckForWhite : CheckForBlack;
 
         std::vector<Move> opponentMoves = generateLegalMovesInternal(
@@ -315,7 +315,7 @@ bool ChessGame::moveInternal(const Move &move) {
             Board preliminaryOpponentBoard = Board(preliminaryBoard);
             preliminaryOpponentBoard.move(m);
 
-            if (!isKingInCheck(turn == White ? Black : White,
+            if (!isKingInCheckInternal(turn == White ? Black : White,
                                preliminaryOpponentBoard)) {
                 outOfCheck = true;
                 break;
@@ -379,7 +379,7 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
         // castling
         if (std::dynamic_pointer_cast<King>(piece) && dx == 2) {
             // initial position
-            if (isKingInCheck(turn, preliminaryBoard)) {
+            if (isKingInCheckInternal(turn, preliminaryBoard)) {
                 continue;
             }
 
@@ -388,7 +388,7 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
             preliminaryBoard.move(intermediate);
 
             // intermediate position
-            if (isKingInCheck(turn, preliminaryBoard)) {
+            if (isKingInCheckInternal(turn, preliminaryBoard)) {
                 continue;
             }
 
@@ -398,7 +398,7 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
             preliminaryBoard.move(final);
 
             // final position
-            if (isKingInCheck(turn, preliminaryBoard)) {
+            if (isKingInCheckInternal(turn, preliminaryBoard)) {
                 continue;
             }
 
@@ -406,7 +406,7 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
             preliminaryBoard.move(m);
 
             // check if move puts king in check
-            if (isKingInCheck(turn, preliminaryBoard)) {
+            if (isKingInCheckInternal(turn, preliminaryBoard)) {
                 continue;
             }
         }
@@ -433,7 +433,7 @@ bool ChessGame::isCheck(const Move &move) const {
     Board preliminaryBoard = Board(*board);
     preliminaryBoard.move(move);
 
-    return isKingInCheck(move.color == White ? Black : White, preliminaryBoard);
+    return isKingInCheckInternal(move.color == White ? Black : White, preliminaryBoard);
 }
 
 bool ChessGame::isMoveSafe(const Move &move) const {
@@ -482,6 +482,10 @@ bool ChessGame::isPromotion(const Move &move) const {
 
     return std::dynamic_pointer_cast<Pawn>(piece) && move.newRow == 7 ||
            move.newRow == 0;
+}
+
+bool ChessGame::kingIsInCheck(PieceColor kingColor) const {
+    return isKingInCheckInternal(kingColor, *board);
 }
 
 int ChessGame::evaluateBoard(PieceColor color) const {
