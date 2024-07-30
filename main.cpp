@@ -17,9 +17,9 @@ int main() {
     std::shared_ptr<TextView> textView = std::make_shared<TextView>(board);
     board->attach(textView);
 
-    // std::shared_ptr<GraphicalView> graphicalView =
-    //     std::make_shared<GraphicalView>(board);
-    // board->attach(graphicalView);
+    std::shared_ptr<GraphicalView> graphicalView =
+        std::make_shared<GraphicalView>(board);
+    board->attach(graphicalView);
 
     board->resetBoard();
     board->placeDefault();
@@ -150,28 +150,28 @@ int main() {
                             std::cin >> piece;
 
                             std::shared_ptr<Piece> p;
-                            if (piece == "Q")
+                            if (piece == "Q" && currentColor == White)
                                 p = std::make_shared<Queen>(White, move.newRow,
                                                             move.newCol);
-                            else if (piece == "q")
+                            else if (piece == "q" && currentColor == Black)
                                 p = std::make_shared<Queen>(Black, move.newRow,
                                                             move.newCol);
-                            else if (piece == "R")
+                            else if (piece == "R" && currentColor == White)
                                 p = std::make_shared<Rook>(White, move.newRow,
                                                            move.newCol);
-                            else if (piece == "r")
+                            else if (piece == "r" && currentColor == Black)
                                 p = std::make_shared<Rook>(Black, move.newRow,
                                                            move.newCol);
-                            else if (piece == "N")
+                            else if (piece == "N" && currentColor == White)
                                 p = std::make_shared<Knight>(White, move.newRow,
                                                              move.newCol);
-                            else if (piece == "n")
+                            else if (piece == "n" && currentColor == Black)
                                 p = std::make_shared<Knight>(Black, move.newRow,
                                                              move.newCol);
-                            else if (piece == "B")
+                            else if (piece == "B" && currentColor == White)
                                 p = std::make_shared<Bishop>(White, move.newRow,
                                                              move.newCol);
-                            else if (piece == "b")
+                            else if (piece == "b" && currentColor == Black)
                                 p = std::make_shared<Bishop>(Black, move.newRow,
                                                              move.newCol);
                             else {
