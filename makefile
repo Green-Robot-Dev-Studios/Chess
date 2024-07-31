@@ -1,12 +1,12 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -g -MMD
+CXXFLAGS=-std=c++17 -g -MMD -Wall
 EXEC=chess
 CCFILES=$(wildcard */*.cpp)
 OBJECTS=${CCFILES:.cpp=.o}
 DEPENDS=${CCFILES:.cpp=.d}
 
 ${EXEC}: ${OBJECTS}
-	${CXX} ${OBJECTS} -o ${EXEC} -lX11 -Wall
+	${CXX} ${OBJECTS} -o ${EXEC} -lX11
 
 -include ${DEPENDS}
 
