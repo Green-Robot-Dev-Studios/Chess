@@ -9,8 +9,8 @@
 #include <vector>
 
 class Board: public Subject {
-public: 
     std::vector<std::vector<Square>> board;
+public: 
     Board();
     Board(const Board &other);
     void resetBoard();
@@ -20,7 +20,7 @@ public:
     void enPassantMove(const Move &move);
     void promotionMove(const Move &move, std::shared_ptr<Piece> promotedPiece);
     std::shared_ptr<Piece> getPieceAt(int, int) const;
-    std::vector<std::vector<Square>> getState() const;
+    std::vector<std::vector<Square>>& getState();
 };
 
 #endif

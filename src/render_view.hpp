@@ -6,8 +6,9 @@
 #include <memory>
 
 class ViewChild : public Observer {
-public:
+protected:
     std::shared_ptr<Board> board;
+public:
     ViewChild(std::shared_ptr<Board> board) : board{board} {};
     virtual ~ViewChild() {}
     virtual void draw() = 0;

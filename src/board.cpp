@@ -1,5 +1,5 @@
 #include "board.hpp"
-#include <iostream>
+#include <math.h>
 
 static constexpr int boardSize = 8;
 
@@ -117,4 +117,4 @@ std::shared_ptr<Piece> Board::getPieceAt(int row, int col) const {
     return board[row][col].getPiece();
 }
 
-std::vector<std::vector<Square>> Board::getState() const { return board; }
+std::vector<std::vector<Square>>& Board::getState() { return board; }

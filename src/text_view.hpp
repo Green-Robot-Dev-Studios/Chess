@@ -5,9 +5,9 @@
 #include <memory>
 
 class TextView : public ViewChild {
+public:
     void draw() override;
     void notify() override;
-public:
     TextView(std::shared_ptr<Board> board) : ViewChild(board) {};
 };
 

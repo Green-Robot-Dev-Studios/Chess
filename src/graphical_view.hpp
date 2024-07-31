@@ -3,7 +3,6 @@
 
 #include "render_view.hpp"
 #include <memory>
-#include <string>
 #include <X11/Xlib.h>
 #include <unordered_map>
 
@@ -16,14 +15,13 @@ class GraphicalView : public ViewChild {
 
     unsigned long colors[10];
 
-
-    void draw() override;
-    void notify() override;
-
     void drawRect(int x, int y, int width, int height, unsigned long color);
     void drawString(int, int, char);
     void drawPiece(int, int, char, bool);
+
 public:
+    void draw() override;
+    void notify() override;
     GraphicalView(std::shared_ptr<Board> board);
 };
 

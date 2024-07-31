@@ -2,7 +2,6 @@
 #include "move.hpp"
 #include "pieces.hpp"
 #include <cmath>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <utility>

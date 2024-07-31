@@ -301,15 +301,15 @@ int main(int argc, char* argv[]) {
                         continue;
                     }
 
-                    if (board->board[row][col].isOccupied())
-                        board->board[row][col].removePiece();
-                    board->board[row][col].setPiece(p);
+                    if (board->getState()[row][col].isOccupied())
+                        board->getState()[row][col].removePiece();
+                    board->getState()[row][col].setPiece(p);
                 } else if (subcommand == "-") {
                     std::string spot;
                     std::cin >> spot;
-                    if (board->board[8 - (spot[1] - '0')][spot[0] - 'a']
+                    if (board->getState()[8 - (spot[1] - '0')][spot[0] - 'a']
                             .isOccupied()) {
-                        board->board[8 - (spot[1] - '0')][spot[0] - 'a']
+                        board->getState()[8 - (spot[1] - '0')][spot[0] - 'a']
                             .removePiece();
                     }
                 } else if (subcommand == "=") {

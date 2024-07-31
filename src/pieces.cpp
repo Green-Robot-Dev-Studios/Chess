@@ -2,7 +2,7 @@
 #include "move.hpp"
 #include <cmath>
 #include <vector>
-#include <iostream>
+#include <ctype.h>
 
 bool Piece::isMoveValid(const Move &move) {
     if (move.oldCol != col || move.oldRow != row) {
