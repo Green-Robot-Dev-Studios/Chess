@@ -18,8 +18,6 @@ void Piece::move(const Move &move) {
     ++moveCount;
 }
 
-void Piece::capture() { captured = true; }
-
 PieceColor Piece::getColor() { return color; }
 
 int Piece::getCol() { return col; }

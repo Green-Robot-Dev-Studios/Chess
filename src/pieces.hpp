@@ -10,7 +10,6 @@ class Piece {
     int row;
     int col;
     int moveCount = 0;
-    bool captured = false;
 
 protected:
     char letter;
@@ -21,7 +20,6 @@ public:
     virtual ~Piece() {}
     bool isMoveValid(const Move &move);
     void move(const Move &move);
-    void capture();
 
     PieceColor getColor();
     int getRow();
