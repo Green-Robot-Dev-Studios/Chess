@@ -8,7 +8,6 @@
 
 ChessGame::ChessGame() {}
 
-// TODO: potential error with player copying
 ChessGame::ChessGame(const ChessGame &other)
     : board(std::make_shared<Board>(*other.board)),
       whitePlayer(other.whitePlayer), blackPlayer(other.blackPlayer),
