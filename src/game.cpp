@@ -375,7 +375,7 @@ std::vector<Move> ChessGame::generateLegalMoves() const {
         std::shared_ptr<Piece> nextPiece =
             board->getPieceAt(m.newRow, m.newCol);
 
-        int dy = abs(m.newRow - m.oldRow);
+        // int dy = abs(m.newRow - m.oldRow);
         int dx = abs(m.newCol - m.oldCol);
 
         Board preliminaryBoard = Board(*board);

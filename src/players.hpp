@@ -14,6 +14,7 @@ protected:
 public:
     bool isHuman;
     Player(PieceColor color, ChessGame* game, bool isHuman) : color(color), score(0), game(game), isHuman(isHuman) {}
+    virtual ~Player() {}
     virtual Move getMove() = 0;
 };
 

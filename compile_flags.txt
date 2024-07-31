@@ -1,3 +1,4 @@
 -std=c++17 
 -o chess 
 -I/usr/X11/include 
+-Wall

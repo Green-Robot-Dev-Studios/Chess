@@ -1,5 +1,5 @@
 #include "graphical_view.hpp"
-#include "bitmaps.cpp"
+#include "bitmaps.hpp"
 
 #include <iostream>
 #include <memory>
@@ -138,7 +138,7 @@ void GraphicalView::draw() {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             unsigned long color;
-            if (i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0) {
+            if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0)) {
                 color = colors[3];
                 drawRect(i * 64, j * 64, 64, 64, color);
             }

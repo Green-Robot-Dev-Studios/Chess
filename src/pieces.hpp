@@ -18,6 +18,7 @@ protected:
 
 public:
     Piece(PieceColor color, int r, int c) : color(color), row(r), col(c) {}
+    virtual ~Piece() {}
     bool isMoveValid(const Move &move);
     void move(const Move &move);
     void capture();

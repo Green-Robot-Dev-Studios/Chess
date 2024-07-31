@@ -8,7 +8,10 @@
 #include <string>
 #include <vector>
 
-int main() {
+int main(int argc, char* argv[]) {
+    bool display = true;
+    if (argc == 2) display = false;
+
     std::string command;
 
     std::shared_ptr<Board> board = std::make_shared<Board>();
@@ -17,9 +20,12 @@ int main() {
     std::shared_ptr<TextView> textView = std::make_shared<TextView>(board);
     board->attach(textView);
 
-    std::shared_ptr<GraphicalView> graphicalView =
-        std::make_shared<GraphicalView>(board);
-    board->attach(graphicalView);
+    std::shared_ptr<GraphicalView> graphicalView;
+    if (display) {
+        graphicalView =
+            std::make_shared<GraphicalView>(board);
+        board->attach(graphicalView);
+    }
 
     board->resetBoard();
     board->placeDefault();

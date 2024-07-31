@@ -9,6 +9,7 @@ class ViewChild : public Observer {
 public:
     std::shared_ptr<Board> board;
     ViewChild(std::shared_ptr<Board> board) : board{board} {};
+    virtual ~ViewChild() {}
     virtual void draw() = 0;
 };
 
