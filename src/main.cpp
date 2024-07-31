@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
                 playerWhite =
                     std::make_shared<Level3>(PieceColor::White, &game);
             } else if (player1 == "computer4") {
-                playerBlack =
+                playerWhite =
                     std::make_shared<Level4>(PieceColor::White, &game);
             } else {
                 std::cout << "Invalid player for white." << std::endl;

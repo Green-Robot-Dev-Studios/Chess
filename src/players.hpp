@@ -4,7 +4,7 @@
 #include "move.hpp"
 #include "game.hpp"
 
-const int MAX_DEPTH = 5;
+const int MAX_DEPTH = 3;
 
 class Player {
 protected:
